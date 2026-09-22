@@ -5,15 +5,21 @@
 slprj/
 codegen/
 
-# Compiled MEX. The C/C++ sources under mex/ are tracked; built binaries are
-# platform-specific and must be rebuilt (see mex/README).
-*.mexw32
-*.mexw64
-*.mexa64
-*.mexmaci64
-*.mexmaca64
+# Intermediate object files from building MEX.
 *.o
 *.obj
+
+# Compiled MEX binaries are platform-specific. The ones we can ship are
+# tracked deliberately -- see mex/README.md -- so only stray builds elsewhere
+# in the tree are ignored.
+*.mexw32
+*.mexglx
+!mex/*/bin/*/*.mexw64
+!mex/*/bin/*/*.mexa64
+!mex/*/bin/*/*.mexmaci64
+!mex/*/bin/*/*.mexmaca64
+!src/*/*.mexw64
+!mex/DepthMapBinIO.mexw64
 
 # --- Visual Studio build artefacts for the MEX projects ---------------------
 *.sdf

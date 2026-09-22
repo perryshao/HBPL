@@ -1,29 +1,34 @@
-# extra/ — 同期其它数据集的实验代码
+# extra/ — experiments on other datasets
 
-这里的代码**不属于**本仓库两篇论文（ICRA 2018 / TCSVT 2019）的主线，
-是同期在其它数据集上做的实验，大多基于 RRV 描述子这一前作。保留是为了存档完整。
+This code is **not** part of the two papers this repository accompanies
+(ICRA 2018 / TCSVT 2019). It covers contemporaneous experiments on other
+datasets, mostly built on the earlier RRV descriptor. It is kept for the
+record.
 
-| 目录 | 数据集 | 备注 |
+| Folder | Dataset | Notes |
 |---|---|---|
-| `msrc12_gesture/` | MSRC-12 Kinect Gesture，12 类 | 含遮挡实验 |
-| `ucf_kinect/` | UCF-Kinect，4 折交叉验证 | |
+| `msrc12_gesture/` | MSRC-12 Kinect Gesture, 12 classes | includes occlusion experiments |
+| `ucf_kinect/` | UCF-Kinect, 4-fold cross-validation | |
 | `msr_daily_act/` | MSR-DailyActivity3D | |
-| `ip_dataset/` | interactplay，16 类 / 4 关节 | 混有 `Determine_segment` 项目的轨迹分割工具 |
+| `ip_dataset/` | interactplay, 16 classes / 4 joints | mixed with trajectory-segmentation tools from a separate `Determine_segment` project |
 
-## 状态
+## Status
 
-**这些代码未经整理，与 `src/` 不同：**
+**Unlike `src/`, this code has not been cleaned up:**
 
-- 仍有硬编码的服务器路径（`/home/data/IPdataset/...`），直接跑会失败
-- 仍在用 `eval` 拼接动态变量名
-- 未做死代码清理，未加函数文档
-- 原始数据集不随仓库分发
+- server paths are still hard-coded (`/home/data/IPdataset/...`), so it will
+  not run as-is
+- dynamic variable names are still built with `eval`
+- dead code was not pruned and no function documentation was added
+- the raw datasets are not distributed here
 
-`src/` 下的三个主线流水线做过审核与重构，情况见
-[../docs/CODE_REVIEW.md](../docs/CODE_REVIEW.md)；本目录不在那次审核范围内。
+The three main pipelines under `src/` were reviewed and refactored; see
+[../docs/CODE_REVIEW.md](../docs/CODE_REVIEW.md). This folder was outside the
+scope of that review.
 
-## `__remote.m` 后缀
+## The `__remote.m` suffix
 
-同名文件在两台机器上出现过内容分叉，两个版本都保留了下来：
-不带后缀的来自本地工作副本，带 `__remote` 的来自另一台机器的较新副本。
-哪个是最终使用的版本，未经考证。
+Some files diverged between two machines and both versions were kept: the
+plain name is the local working copy, the `__remote` one is the newer copy
+from the other machine. Which of the two was actually used was not
+established.
