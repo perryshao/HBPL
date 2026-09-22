@@ -1,9 +1,10 @@
 # Third-party notices
 
-The MIT licence in `LICENSE` covers the code written for this project. The
-files below were written by others, are vendored here unmodified, and keep
-their own terms. This list is provided in good faith; where a file carries no
-explicit licence text, the upstream project's terms govern.
+The MIT licence in [`LICENSE`](LICENSE) covers the code written for this
+project, and nothing else. The files below were written by others, are vendored
+here unmodified, and keep their own terms. This list is provided in good faith;
+where a file carries no explicit licence text, the upstream project's terms
+govern.
 
 ## minimize.m — Carl Edward Rasmussen
 
