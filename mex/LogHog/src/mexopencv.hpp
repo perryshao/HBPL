@@ -81,7 +81,7 @@ const ConstMap<std::string,int> ThreshType = ConstMap<std::string,int>
 
 /// Distance types for Distance Transform and M-estimators
 const ConstMap<std::string,int> DistType = ConstMap<std::string,int>
-    ("User",   CV_DIST_USER) 
+    ("User",   CV_DIST_USER)
     ("L1",     CV_DIST_L1)
     ("L2",     CV_DIST_L2)
     ("C",      CV_DIST_C)

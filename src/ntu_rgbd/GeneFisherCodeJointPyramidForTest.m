@@ -1,5 +1,5 @@
 function [testdata, sum_FvSPM_time] = GeneFisherCodeJointPyramidForTest(RRV_SAMPLES, jointNum, ntotalbh, batchsize, pcaFlag, modelFile)
-%GENEFISHERCODEJOINTPYRAMIDFORTEST  Encode test clips with an already-fitted GMM.
+% GENEFISHERCODEJOINTPYRAMIDFORTEST  Encode test clips with an already-fitted GMM.
 %
 %   [testdata, sum_FvSPM_time] = GENEFISHERCODEJOINTPYRAMIDFORTEST( ...
 %       RRV_SAMPLES, jointNum, ntotalbh, batchsize, pcaFlag, modelFile)
@@ -49,7 +49,7 @@ clear S
 
 o = struct('jointNum', jointNum, ...
            'codeLength', size(modelForTest.covariances, 1) * ...
-                         size(modelForTest.covariances, 2) * 2 * sum(pyramid), ...
+           size(modelForTest.covariances, 2) * 2 * sum(pyramid), ...
            'pcaFlag', pcaFlag, ...
            'PcaM', modelForTest.PcaM, ...
            'means', modelForTest.means, ...
@@ -67,8 +67,8 @@ testdata   = [];
 
 tic;
 for k = 1:batchTimes + 1
-    first = (k-1)*batchsize + 1;
-    last  = min(k*batchsize, nSamples);
+    first = (k - 1) * batchsize + 1;
+    last  = min(k * batchsize, nSamples);
     if first > last
         break                       % exact multiple: no trailing partial chunk
     end

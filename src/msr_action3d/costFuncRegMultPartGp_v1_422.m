@@ -1,5 +1,5 @@
 function [f, df] = costFuncRegMultPartGp_v1_422(initialTheta, X, Y, lambda, C, jointNum, preTinitialTheta)
-%COSTFUNCREGMULTPARTGP_V1_422  HBPL objective/gradient -- l_{4,2} ablation, Table II
+% COSTFUNCREGMULTPARTGP_V1_422  HBPL objective/gradient -- l_{4,2} ablation, Table II
 %
 %   Thin wrapper kept for backward compatibility: MINIMIZE receives this
 %   function *by name* as a string, and its parameter list is already full

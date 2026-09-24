@@ -75,3 +75,8 @@ Thumbs.db
 
 # MATLAB auto-generated search path; machine-local, never source.
 pathdef.m
+
+# Local Python verification tools.
+__pycache__/
+*.pyc
+.venv/

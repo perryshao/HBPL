@@ -1,5 +1,5 @@
 function code = hbplFisherEncodeAction(descriptor, o)
-%HBPLFISHERENCODEACTION  Fisher-encode one action, body-part by body-part.
+% HBPLFISHERENCODEACTION  Fisher-encode one action, body-part by body-part.
 %
 %   code = HBPLFISHERENCODEACTION(descriptor, o)
 %
@@ -10,8 +10,9 @@ function code = hbplFisherEncodeAction(descriptor, o)
 %   concatenated.
 %
 %   INPUTS
-%     descriptor   F x T   HRRV descriptor for one action; rows are stacked
-%                          per body-part, columns are time
+%     descriptor   (T*P) x F   T frames per part, P body-parts, F descriptor
+%                              components (7 before optional PCA). Each
+%                              contiguous T-row block holds one body-part.
 %     o            struct  encoder settings:
 %                            .jointNum     number of body-parts
 %                            .codeLength   Fisher code length per part
@@ -32,11 +33,11 @@ code        = zeros(o.codeLength * o.jointNum, 1);
 frameLength = floor(size(descriptor, 1) / o.jointNum);
 
 for m = 1:o.jointNum
-    feats = descriptor((m-1)*frameLength + 1 : m*frameLength, :);
+    feats = descriptor((m - 1) * frameLength + 1:m * frameLength, :);
     if o.pcaFlag
         feats = feats * o.PcaM;
     end
-    rows = (m-1)*o.codeLength + 1 : m*o.codeLength;
+    rows = (m - 1) * o.codeLength + 1:m * o.codeLength;
     code(rows) = fv_pooling_ts(feats', o.means, o.covariances, o.priors, ...
                                'Improved', o.pyramid);
 end

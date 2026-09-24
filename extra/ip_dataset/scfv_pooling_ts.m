@@ -1,8 +1,8 @@
 function [beta] = scfv_pooling_ts(feaSet, B, pyramid, gamma)
-%================================================
-% 
+% ================================================
+%
 % Usage:
-% Compute the linear spatial pyramid feature using sparse coding. 
+% Compute the linear spatial pyramid feature using sparse coding.
 %
 % Inputss:
 % feaSet        local feature array extracted from the
@@ -10,8 +10,8 @@ function [beta] = scfv_pooling_ts(feaSet, B, pyramid, gamma)
 
 % B             -sparse dictionary, column-wise
 % gamma         -sparsity regularization parameter
-% pyramid       -defines structure of pyramid 
-% 
+% pyramid       -defines structure of pyramid
+%
 % Output:
 % beta          -multiscale max pooling feature
 %
@@ -20,25 +20,24 @@ function [beta] = scfv_pooling_ts(feaSet, B, pyramid, gamma)
 % July 2008
 %
 % Revised May. 2010
-%===============================================
+% ===============================================
 
-dSize = size(B,2);
+dSize = size(B, 2);
 nSmp = size(feaSet, 2);
 sc_codes = zeros(dSize, nSmp);
 
-
 % compute the local feature for each local feature
 beta = 1e-4;
-A = B'*B + 2*beta*eye(dSize);
-Q = -B'*feaSet;
+A = B' * B + 2 * beta * eye(dSize);
+Q = -B' * feaSet;
 
 for iter1 = 1:nSmp,
     sc_codes(:, iter1) = L1QP_FeatureSign_yang(gamma, A, Q(:, iter1));
 end
 
 sc_codes = abs(sc_codes);
-scfv_codes =(feaSet - B*sc_codes)*sc_codes'; % for sparse coding based fisher vectors
-dSize = size(scfv_codes,1);
+scfv_codes = (feaSet - B * sc_codes) * sc_codes'; % for sparse coding based fisher vectors
+dSize = size(scfv_codes, 1);
 % spatial levels
 pLevels = length(pyramid);
 % total spatial bins
@@ -47,19 +46,19 @@ tBins = sum(pyramid);
 beta = zeros(dSize, tBins);
 bId = 0;
 
-for iter1 = 1:pLevels,    
-    Unit = nSmp / pyramid(iter1);  
+for iter1 = 1:pLevels,
+    Unit = nSmp / pyramid(iter1);
     % find to which spatial bin each local descriptor belongs
-    idxBin = ceil((1:nSmp)/Unit);
-    
-    for iter2 = 1: pyramid(iter1),     
+    idxBin = ceil((1:nSmp) / Unit);
+
+    for iter2 = 1:pyramid(iter1),
         bId = bId + 1;
         sidxBin = find(idxBin == iter2);
         if isempty(sidxBin),
             continue;
-        end      
-        %beta(:, bId) = max(scfv_codes(:, sidxBin), [], 2);
-		beta(:, bId) = sum(scfv_codes(:, sidxBin), 2);
+        end
+        % beta(:, bId) = max(scfv_codes(:, sidxBin), [], 2);
+        beta(:, bId) = sum(scfv_codes(:, sidxBin), 2);
     end
 end
 
@@ -68,5 +67,5 @@ if bId ~= tBins,
 end
 
 beta = beta(:);
-beta = beta./sqrt(sum(beta.^2));
-beta(isnan(beta)) = 0;% avoid NaN
+beta = beta ./ sqrt(sum(beta.^2));
+beta(isnan(beta)) = 0; % avoid NaN

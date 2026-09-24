@@ -1,5 +1,5 @@
 function dirPath = hbplDataDir(what)
-%HBPLDATADIR  Resolve a data location without hard-coding absolute paths.
+% HBPLDATADIR  Resolve a data location without hard-coding absolute paths.
 %
 %   dirPath = HBPLDATADIR('batches')  folder holding the cached per-batch
 %                                     feature files traindata<k>.mat and
@@ -11,10 +11,13 @@ function dirPath = hbplDataDir(what)
 %     1. environment variable  HBPL_BATCH_DIR  /  HBPL_RAW_DIR
 %     2. <repo>/cache/batches  /  <repo>/data
 %
-%   So a fresh clone runs with no edits, and a machine with the data
-%   elsewhere only needs, e.g.
+%   Override the cache location without editing the pipeline, e.g.
 %
 %       setenv('HBPL_BATCH_DIR', '/scratch/ntu/batches')
+%
+%   This helper creates missing directories; it does not prepare or validate
+%   datasets. The pipeline still requires per-joint MAT tables in its current
+%   folder, as described in README.md.
 %
 %   The returned path always ends with a file separator, matching how the
 %   original scripts concatenated it.
@@ -51,5 +54,5 @@ if exist(dirPath, 'dir') ~= 7
 end
 
 if dirPath(end) ~= filesep
-    dirPath(end+1) = filesep;
+    dirPath(end + 1) = filesep;
 end

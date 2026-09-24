@@ -1,5 +1,5 @@
 function [RRV_DB, RRV_SAMPLES] = GeneFeatsPerBody(bodyJoints, Normalize_Joints)
-%GENEFEATSPERBODY  Build HRRV descriptors for every body-part of every clip.
+% GENEFEATSPERBODY  Build HRRV descriptors for every body-part of every clip.
 %
 %   [RRV_DB, RRV_SAMPLES] = GENEFEATSPERBODY(bodyJoints, Normalize_Joints)
 %
@@ -47,10 +47,9 @@ RRV_SAMPLES = buildDescriptors(bodyJoints, Normalize_Joints, 'samples', 'TRAJSAM
 save RRV_SAMPLES RRV_SAMPLES;
 end
 
-
 % --------------------------------------------------------------------------
 function descriptors = buildDescriptors(bodyJoints, Normalize_Joints, fileSuffix, varName, label)
-%BUILDDESCRIPTORS  Run the pipeline over one split (training or test).
+% BUILDDESCRIPTORS  Run the pipeline over one split (training or test).
 %
 %   The two halves of the original file were identical apart from the file
 %   suffix and the variable name stored inside those files.
@@ -63,13 +62,13 @@ jointGroup = size(bodyJoints, 1);
 rootSlot = zeros(1, jointGroup);
 endSlot  = zeros(1, jointGroup);
 for n = 1:jointGroup
-    rootSlot(n) = slotOf(bodyJoints{n,1});
-    endSlot(n)  = slotOf(bodyJoints{n,end});
+    rootSlot(n) = slotOf(bodyJoints{n, 1});
+    endSlot(n)  = slotOf(bodyJoints{n, end});
 end
-c7Slot   = slotOf(Normalize_Joints{1,1});
-strnSlot = slotOf(Normalize_Joints{1,2});
-rfwtSlot = slotOf(Normalize_Joints{2,1});
-lfwtSlot = slotOf(Normalize_Joints{2,2});
+c7Slot   = slotOf(Normalize_Joints{1, 1});
+strnSlot = slotOf(Normalize_Joints{1, 2});
+rfwtSlot = slotOf(Normalize_Joints{2, 1});
+lfwtSlot = slotOf(Normalize_Joints{2, 2});
 
 nSamples    = size(tables{1}, 2);
 descriptors = cell(1, nSamples);
@@ -78,44 +77,43 @@ for i = 1:nSamples
     fprintf('get the RRV descriptors for %s data %d/%d...\n', label, i, nSamples);
 
     % --- person-centric frame for this clip -------------------------------
-    joint_C7   = tables{c7Slot}{2,i};
-    joint_STRN = tables{strnSlot}{2,i};
-    joint_RFWT = tables{rfwtSlot}{2,i};
-    joint_LFWT = tables{lfwtSlot}{2,i};
+    joint_C7   = tables{c7Slot}{2, i};
+    joint_STRN = tables{strnSlot}{2, i};
+    joint_RFWT = tables{rfwtSlot}{2, i};
+    joint_LFWT = tables{lfwtSlot}{2, i};
 
-    ScalLeng = norm(joint_C7(1,:) - joint_STRN(1,:));      % torso length
+    ScalLeng = norm(joint_C7(1, :) - joint_STRN(1, :));      % torso length
 
-    v1 = joint_C7(1,:) - joint_RFWT(1,:);
-    v2 = joint_C7(1,:) - joint_LFWT(1,:);
+    v1 = joint_C7(1, :) - joint_RFWT(1, :);
+    v2 = joint_C7(1, :) - joint_LFWT(1, :);
     Hy = v1 + v2;                  % up, bisecting the two hip directions
     Hz = cross(v1, v2);            % forward, normal to the shoulder-hip plane
     Hx = cross(Hy, Hz);            % lateral, completing a right-handed frame
-    RotM = [Hx/norm(Hx); Hy/norm(Hy); Hz/norm(Hz)];
+    RotM = [Hx / norm(Hx); Hy / norm(Hy); Hz / norm(Hz)];
 
     % --- one RRV descriptor per body-part, stacked vertically -------------
     for n = 1:jointGroup
-        rootTraj = tables{rootSlot(n)}{2,i};
-        endTraj  = tables{endSlot(n)}{2,i};
+        rootTraj = tables{rootSlot(n)}{2, i};
+        endTraj  = tables{endSlot(n)}{2, i};
         T        = size(rootTraj, 1);            % frames in this clip
 
         rootTraj = (rootTraj - joint_STRN) * RotM' / ScalLeng;
         endTraj  = (endTraj  - joint_STRN) * RotM' / ScalLeng;
 
-        descriptors{1,i}((n-1)*T+1 : n*T, :) = Func_RRVdescriptor(rootTraj, endTraj);
+        descriptors{1, i}((n - 1) * T + 1:n * T, :) = Func_RRVdescriptor(rootTraj, endTraj);
     end
 end
 end
 
-
 % --------------------------------------------------------------------------
 function [tables, slotOf] = loadJointTables(bodyJoints, Normalize_Joints, fileSuffix, varName)
-%LOADJOINTTABLES  Load each referenced joint's trajectory table exactly once.
+% LOADJOINTTABLES  Load each referenced joint's trajectory table exactly once.
 %
 %   tables{k}   cell array loaded from <id><fileSuffix>.mat
 %   slotOf      containers.Map from joint id to its index in `tables`
 
-ids = [bodyJoints(:,1); bodyJoints(:,2); bodyJoints(:,end); ...
-       Normalize_Joints(:,1); Normalize_Joints(:,end)];
+ids = [bodyJoints(:, 1); bodyJoints(:, 2); bodyJoints(:, end); ...
+       Normalize_Joints(:, 1); Normalize_Joints(:, end)];
 ids = unique(ids(:), 'stable');
 
 tables = cell(1, numel(ids));

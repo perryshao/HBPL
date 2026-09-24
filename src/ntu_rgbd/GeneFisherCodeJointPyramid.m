@@ -1,5 +1,5 @@
 function [trainGID, testGID] = GeneFisherCodeJointPyramid(jointNum, ntotalbh, numClusters, trainGID, testGID, batchsize, pcaFlag)
-%GENEFISHERCODEJOINTPYRAMID  Fisher-vector encoding with a temporal pyramid.
+% GENEFISHERCODEJOINTPYRAMID  Fisher-vector encoding with a temporal pyramid.
 %
 %   [trainGID, testGID] = GENEFISHERCODEJOINTPYRAMID(jointNum, ntotalbh, ...
 %                             numClusters, trainGID, testGID, batchsize, pcaFlag)
@@ -54,7 +54,7 @@ lastNsmp  = 0;
 while lastNsmp < nsmp
     chunk = rand_sampling_ts(DB_DESCRIPTORS, nsmp);
     chunk(:, ~any(chunk, 1)) = [];
-    currentX{end+1} = chunk;                    %#ok<AGROW>
+    currentX{end + 1} = chunk;                    %#ok<AGROW>
     lastNsmp = lastNsmp + size(chunk, 2);
 end
 X = [currentX{:}];
@@ -62,9 +62,9 @@ clear currentX chunk
 
 if pcaFlag
     [coeff, ~, latent] = pca(X');
-    PcaM = coeff(:, cumsum(latent)/sum(latent) < 0.98);
+    PcaM = coeff(:, cumsum(latent) / sum(latent) < 0.98);
     X    = PcaM' * X;
-    X    = X ./ sqrt(repmat(latent(1:size(PcaM,2)), 1, lastNsmp));   % PCA whitening
+    X    = X ./ sqrt(repmat(latent(1:size(PcaM, 2)), 1, lastNsmp));   % PCA whitening
 else
     PcaM = zeros(3, 3);
 end
@@ -98,10 +98,9 @@ clear S
 encodeToChunks(SAMPLES_DESCRIPTORS, 'testdata', 'testing', dataFolder, batchsize, fvOpts);
 end
 
-
 % --------------------------------------------------------------------------
 function encodeToChunks(descriptors, prefix, label, dataFolder, batchsize, o)
-%ENCODETOCHUNKS  Encode every action and write fixed-size chunks to disk.
+% ENCODETOCHUNKS  Encode every action and write fixed-size chunks to disk.
 %
 %   The original spelled this loop out four times (train/test x full/partial
 %   chunk) and assembled the variable names with eval. One loop with a
@@ -111,8 +110,8 @@ nSamples   = size(descriptors, 2);
 batchTimes = floor(nSamples / batchsize);
 
 for k = 1:batchTimes + 1
-    first = (k-1)*batchsize + 1;
-    last  = min(k*batchsize, nSamples);
+    first = (k - 1) * batchsize + 1;
+    last  = min(k * batchsize, nSamples);
     if first > last
         break                       % exact multiple: no trailing partial chunk
     end

@@ -1,9 +1,9 @@
 function theta = trainBinRegression(X, trainGID, lambda, jointNum, modalityNum) %#ok<INUSD>
-%TRAINBINREGRESSION  Fit the HBPL weight matrix by multi-class regression.
+% TRAINBINREGRESSION  Fit the HBPL weight matrix by multi-class regression.
 %
 %   theta = TRAINBINREGRESSION(X, trainGID, lambda, jointNum, modalityNum)
 %
-%   Minimises Eq. (13) of the TCSVT paper with L-BFGS (see MINIMIZE), using
+%   Minimises Eq. (13) of the TCSVT paper with nonlinear conjugate gradient (see MINIMIZE), using
 %   the hierarchical mixed norm supplied by COSTFUNCREGMULTPARTGP_V2. The
 %   whole training set is used as one batch; NTU RGB+D is too large for that
 %   and uses TRAINBINREGRESSION_SHUFFLEBATCH instead.
@@ -51,12 +51,12 @@ batchTimes = 1;                 % full batch: this dataset fits in memory
 iterNum    = 10;
 batchsize  = floor(N / batchTimes);
 
-initialTheta     = zeros(D*classNum, 1);   % vec(W)
-preTinitialTheta = zeros(D*classNum, 1);   % proximal target; inactive, lambda(3)=0
+initialTheta     = zeros(D * classNum, 1);   % vec(W)
+preTinitialTheta = zeros(D * classNum, 1);   % proximal target; inactive, lambda(3)=0
 
 for iter = 1:iterNum
     for batchtimes = 1:batchTimes
-        cols   = (batchtimes-1)*batchsize + 1 : batchtimes*batchsize;
+        cols   = (batchtimes - 1) * batchsize + 1:batchtimes * batchsize;
         Xbatch = X(:, cols);
         Ybatch = Y(cols, :);
 

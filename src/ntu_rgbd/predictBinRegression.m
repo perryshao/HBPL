@@ -1,5 +1,5 @@
 function predictLabel = predictBinRegression(theta, testGID, batchsize)
-%PREDICTBINREGRESSION  Classify NTU RGB+D test samples with the learned weights.
+% PREDICTBINREGRESSION  Classify NTU RGB+D test samples with the learned weights.
 %
 %   predictLabel = PREDICTBINREGRESSION(theta, testGID, batchsize)
 %
@@ -29,7 +29,7 @@ predictLabel = zeros(N, 1);
 
 for batchtimes = 1:batchTimes
     Xbatch = loadBatch(dataFolder, 'testdata', batchtimes);
-    rows   = (batchtimes-1)*batchsize + 1 : batchtimes*batchsize;
+    rows   = (batchtimes - 1) * batchsize + 1:batchtimes * batchsize;
     fprintf('Testing Batch times %d\n', batchtimes);
     [~, predictLabel(rows)] = max(Xbatch' * theta, [], 2);
 end
@@ -37,17 +37,16 @@ end
 % Trailing partial chunk. Guarded, so a test set smaller than one batch -- where
 % the loop above never runs -- still works; the original indexed an undefined
 % loop variable in that case.
-if batchTimes*batchsize < N
+if batchTimes * batchsize < N
     last   = batchTimes + 1;
     Xbatch = loadBatch(dataFolder, 'testdata', last);
     fprintf('Testing Batch times %d \n', last);
-    [~, predictLabel(batchTimes*batchsize+1:end)] = max(Xbatch' * theta, [], 2);
+    [~, predictLabel(batchTimes * batchsize + 1:end)] = max(Xbatch' * theta, [], 2);
 end
 end
-
 
 function M = loadBatch(folder, prefix, k)
-%LOADBATCH  Read chunk <prefix><k>.mat, whose single variable is named the same.
+% LOADBATCH  Read chunk <prefix><k>.mat, whose single variable is named the same.
 %
 %   The original did this with eval(['load ' ...]) followed by
 %   eval(['Xbatch= ' ...]). Loading into a struct is equivalent and lets

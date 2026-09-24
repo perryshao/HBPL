@@ -1,0 +1,100 @@
+[
+  {
+    "source": "/Volumes/OneTouch/Phd-Related/MyWork/Mexfunction_C/DepthMapBinIOSample/pingme.txt",
+    "target": "mex/DepthMapBinIO-src/pingme.txt",
+    "original_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "installed_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "adapted": false
+  },
+  {
+    "source": "/Volumes/OneTouch/Phd-Related/MyWork/Mexfunction_C/DepthMapBinIOSample/DepthMapBinIOSample.sln",
+    "target": "mex/DepthMapBinIO-src/DepthMapBinIOSample.sln",
+    "original_sha256": "1ae6b9dcff75a3917e1a12afa157f07cf30c5895b81e6af6bcc7cef4d178ef89",
+    "installed_sha256": "1ae6b9dcff75a3917e1a12afa157f07cf30c5895b81e6af6bcc7cef4d178ef89",
+    "adapted": false
+  },
+  {
+    "source": "/Volumes/OneTouch/Phd-Related/MyWork/Mexfunction_C/DepthMapBinIOSample/DepthMapBinIOSample/stdafx.h",
+    "target": "mex/DepthMapBinIO-src/DepthMapBinIOSample/stdafx.h",
+    "original_sha256": "45ea38913a48aecd12e991a6f00663ea6eb2e744c56ad45aef8290e7029b1bcb",
+    "installed_sha256": "45ea38913a48aecd12e991a6f00663ea6eb2e744c56ad45aef8290e7029b1bcb",
+    "adapted": false
+  },
+  {
+    "source": "/Volumes/OneTouch/Phd-Related/MyWork/Mexfunction_C/DepthMapBinIOSample/DepthMapBinIOSample/DepthMap.cpp",
+    "target": "mex/DepthMapBinIO-src/DepthMapBinIOSample/DepthMap.cpp",
+    "original_sha256": "5bdf367ad7d9af4889f91e10d15cf9952da9fc18e7999c0e13245b062c35ebeb",
+    "installed_sha256": "5bdf367ad7d9af4889f91e10d15cf9952da9fc18e7999c0e13245b062c35ebeb",
+    "adapted": false
+  },
+  {
+    "source": "/Volumes/OneTouch/Phd-Related/MyWork/Mexfunction_C/DepthMapBinIOSample/DepthMapBinIOSample/DepthMapBinFileIO.h",
+    "target": "mex/DepthMapBinIO-src/DepthMapBinIOSample/DepthMapBinFileIO.h",
+    "original_sha256": "0a28325d8d1b0b0bbbb52e6c21825b3c94bf3d146c43c36ecc7c17304a99166e",
+    "installed_sha256": "0a28325d8d1b0b0bbbb52e6c21825b3c94bf3d146c43c36ecc7c17304a99166e",
+    "adapted": false
+  },
+  {
+    "source": "/Volumes/OneTouch/Phd-Related/MyWork/Mexfunction_C/DepthMapBinIOSample/DepthMapBinIOSample/DepthMap.h",
+    "target": "mex/DepthMapBinIO-src/DepthMapBinIOSample/DepthMap.h",
+    "original_sha256": "2315c7c5a1fef1f9c70e03b5aea92a6e7bfa7cc946ea3b7f581ca6346565b2fa",
+    "installed_sha256": "2315c7c5a1fef1f9c70e03b5aea92a6e7bfa7cc946ea3b7f581ca6346565b2fa",
+    "adapted": false
+  },
+  {
+    "source": "/Volumes/OneTouch/Phd-Related/MyWork/Mexfunction_C/DepthMapBinIOSample/DepthMapBinIOSample/targetver.h",
+    "target": "mex/DepthMapBinIO-src/DepthMapBinIOSample/targetver.h",
+    "original_sha256": "bad5ca557eb99c1e3a43d3098fe0fef8def7228b724dcff3a72143f3717a8eb8",
+    "installed_sha256": "bad5ca557eb99c1e3a43d3098fe0fef8def7228b724dcff3a72143f3717a8eb8",
+    "adapted": false
+  },
+  {
+    "source": "/Volumes/OneTouch/Phd-Related/MyWork/Mexfunction_C/DepthMapBinIOSample/DepthMapBinIOSample/DepthMapBinIO.cpp",
+    "target": "mex/DepthMapBinIO-src/DepthMapBinIOSample/DepthMapBinIO.cpp",
+    "original_sha256": "1422589764c1baf85fcaca4fef0cf4d7258e6df6eb42e9423f3a763d17bbc11f",
+    "installed_sha256": "1422589764c1baf85fcaca4fef0cf4d7258e6df6eb42e9423f3a763d17bbc11f",
+    "adapted": false
+  },
+  {
+    "source": "/Volumes/OneTouch/Phd-Related/MyWork/Mexfunction_C/DepthMapBinIOSample/DepthMapBinIOSample/DepthMapBinFileIO.cpp",
+    "target": "mex/DepthMapBinIO-src/DepthMapBinIOSample/DepthMapBinFileIO.cpp",
+    "original_sha256": "34f24ad6e3b218d41e2e3ba1ffe49880a6ec35756a36f43aca03b5babe160984",
+    "installed_sha256": "34f24ad6e3b218d41e2e3ba1ffe49880a6ec35756a36f43aca03b5babe160984",
+    "adapted": false
+  },
+  {
+    "source": "/Volumes/OneTouch/Phd-Related/MyWork/Mexfunction_C/DepthMapBinIOSample/DepthMapBinIOSample/DepthMapBinIOSample.vcproj",
+    "target": "mex/DepthMapBinIO-src/DepthMapBinIOSample/DepthMapBinIOSample.vcproj",
+    "original_sha256": "8defa0dff2c3b225470ca27d75d4779a796ed4b3149bcaf2ad357bdca33ba2da",
+    "installed_sha256": "8defa0dff2c3b225470ca27d75d4779a796ed4b3149bcaf2ad357bdca33ba2da",
+    "adapted": false
+  },
+  {
+    "source": "/Volumes/OneTouch/Phd-Related/MyWork/Mexfunction_C/DepthMapBinIOSample/DepthMapBinIOSample/ReadMe.txt",
+    "target": "mex/DepthMapBinIO-src/DepthMapBinIOSample/ReadMe.txt",
+    "original_sha256": "9de3dbd79b7e5613b37eec5e1a903fb0cc5420619ea0bf11585c1a0270e248c6",
+    "installed_sha256": "9de3dbd79b7e5613b37eec5e1a903fb0cc5420619ea0bf11585c1a0270e248c6",
+    "adapted": false
+  },
+  {
+    "source": "/Volumes/OneTouch/Phd-Related/MyWork/Mexfunction_C/DepthMapBinIOSample/DepthMapBinIOSample/DepthMapBinIOSample.cpp",
+    "target": "mex/DepthMapBinIO-src/DepthMapBinIOSample/DepthMapBinIOSample.cpp",
+    "original_sha256": "469559736d17ee1d6938dcb0d4810f158347a409e7fc48ecf5ccf156c190d63e",
+    "installed_sha256": "469559736d17ee1d6938dcb0d4810f158347a409e7fc48ecf5ccf156c190d63e",
+    "adapted": false
+  },
+  {
+    "source": "/Volumes/OneTouch/Phd-Related/MyWork/Mexfunction_C/DepthMapBinIOSample/DepthMapBinIOSample/DepthMapBinIOSample.vcxproj",
+    "target": "mex/DepthMapBinIO-src/DepthMapBinIOSample/DepthMapBinIOSample.vcxproj",
+    "original_sha256": "146e3fc528350a403a11d120d1863b1d672156250d9ec77ed6d049eab71f5b12",
+    "installed_sha256": "146e3fc528350a403a11d120d1863b1d672156250d9ec77ed6d049eab71f5b12",
+    "adapted": false
+  },
+  {
+    "source": "/Volumes/OneTouch/Phd-Related/MyWork/Mexfunction_C/DepthMapBinIOSample/DepthMapBinIOSample/stdafx.cpp",
+    "target": "mex/DepthMapBinIO-src/DepthMapBinIOSample/stdafx.cpp",
+    "original_sha256": "5067dfe45dd3a24d08bfdcb5e2fd33c432adf6236e13ca95a9bf1a2234ed1079",
+    "installed_sha256": "5067dfe45dd3a24d08bfdcb5e2fd33c432adf6236e13ca95a9bf1a2234ed1079",
+    "adapted": false
+  }
+]

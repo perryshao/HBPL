@@ -1,5 +1,5 @@
 function theta = trainBinRegression_shuffleBatch(trainGID, lambda, jointNum, modalityNum, batchsize) %#ok<INUSL>
-%TRAINBINREGRESSION_SHUFFLEBATCH  Fit HBPL weights on NTU RGB+D by mini-batch SGD.
+% TRAINBINREGRESSION_SHUFFLEBATCH  Fit HBPL weights on NTU RGB+D by mini-batch SGD.
 %
 %   theta = TRAINBINREGRESSION_SHUFFLEBATCH(trainGID, lambda, jointNum, ...
 %                                           modalityNum, batchsize)
@@ -8,7 +8,7 @@ function theta = trainBinRegression_shuffleBatch(trainGID, lambda, jointNum, mod
 %   memory. GENEFISHERCODEJOINTPYRAMID therefore writes it out as numbered
 %   chunks traindata1.mat, traindata2.mat, ... and this function streams them:
 %   each epoch visits every chunk once, in a fresh random order, running a
-%   single L-BFGS line search per chunk.
+%   single nonlinear conjugate gradient line search per chunk.
 %
 %   INPUTS
 %     trainGID     N x 1    class labels, 1..C
@@ -52,14 +52,14 @@ batchTimes = floor(numTrain / batchsize);
 
 D = size(loadBatch(dataFolder, 'traindata', 1), 1);
 
-initialTheta     = zeros(D*classNum, 1);   % vec(W)
-preTinitialTheta = zeros(D*classNum, 1);   % proximal target; inactive, lambda(3)=0
+initialTheta     = zeros(D * classNum, 1);   % vec(W)
+preTinitialTheta = zeros(D * classNum, 1);   % proximal target; inactive, lambda(3)=0
 
 iterNum = 40;
 for iter = 1:iterNum
     for batchtimes = randperm(batchTimes)
         Xbatch = loadBatch(dataFolder, 'traindata', batchtimes);
-        rows   = (batchtimes-1)*batchsize + 1 : batchtimes*batchsize;
+        rows   = (batchtimes - 1) * batchsize + 1:batchtimes * batchsize;
         fprintf('Iteration %d Batch %d\n', iter, batchtimes);
 
         % One line search per chunk: this is the SGD step of the paper.
@@ -68,13 +68,15 @@ for iter = 1:iterNum
                                 preTinitialTheta);
     end
 
-    % Trailing partial chunk.
-    last   = batchTimes + 1;
-    Xbatch = loadBatch(dataFolder, 'traindata', last);
-    fprintf('Iteration %d Batch %d \n', iter, last);
-    initialTheta = minimize(initialTheta, 'costFuncRegMultPartGp_v2', 1, ...
-                            Xbatch, Y(batchTimes*batchsize+1:end, :), lambda, ...
-                            classNum, jointNum, preTinitialTheta);
+    % The encoder writes a trailing chunk only when samples remain.
+    if batchTimes * batchsize < numTrain
+        last = batchTimes + 1;
+        Xbatch = loadBatch(dataFolder, 'traindata', last);
+        fprintf('Iteration %d Batch %d \n', iter, last);
+        initialTheta = minimize(initialTheta, 'costFuncRegMultPartGp_v2', 1, ...
+                                Xbatch, Y(batchTimes * batchsize + 1:end, :), lambda, ...
+                                classNum, jointNum, preTinitialTheta);
+    end
 end
 
 save initialTheta initialTheta -v7.3;
@@ -82,9 +84,8 @@ theta = reshape(initialTheta, D, classNum);
 save theta theta -v7.3;
 end
 
-
 function M = loadBatch(folder, prefix, k)
-%LOADBATCH  Read chunk <prefix><k>.mat, whose single variable is named the same.
+% LOADBATCH  Read chunk <prefix><k>.mat, whose single variable is named the same.
 %
 %   The original code did this with eval(['load ' ...]) followed by
 %   eval(['Xbatch= ' ...]). Loading into a struct is equivalent and lets

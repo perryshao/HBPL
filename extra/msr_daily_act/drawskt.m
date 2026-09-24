@@ -1,118 +1,115 @@
-%USAGE: drawskt(1,3,1,4,1,2) --- show actions 1,2,3 performed by subjects 1,2,3,4 with instances 1 and 2.
-function drawskt(a1,a2,s1,s2,e1,e2)
+% USAGE: drawskt(1,3,1,4,1,2) --- show actions 1,2,3 performed by subjects 1,2,3,4 with instances 1 and 2.
+function drawskt(a1, a2, s1, s2, e1, e2)
 
-J=[4     5     9     5     6    7     9    10    11     3     2     1     1      13     14    15    17    18   19;
-    3     3     3     6    7    8     10    11    12    2     1     13    17    14    15    16    18    19   20 ];
+J = [4     5     9     5     6    7     9    10    11     3     2     1     1      13     14    15    17    18   19
+     3     3     3     6    7    8     10    11    12    2     1     13    17    14    15    16    18    19   20];
 
-B=[];
-for a=a1:a2
-    for s=s1:s2
-        for e=e1:e2
-            file=sprintf('MSRDailyAct3DSkeletonReal/db/a%02i_s%02i_e%02i_skeleton.txt',a,s,e);
-            fp=fopen(file);
-            if (fp>0)
-               A=fscanf(fp,'%f');
-               B=[B; A];
-               fclose(fp);
+B = [];
+for a = a1:a2
+    for s = s1:s2
+        for e = e1:e2
+            file = sprintf('MSRDailyAct3DSkeletonReal/db/a%02i_s%02i_e%02i_skeleton.txt', a, s, e);
+            fp = fopen(file);
+            if fp > 0
+                A = fscanf(fp, '%f');
+                B = [B; A];
+                fclose(fp);
             end
         end
     end
 end
 
-
 T = A(1);
-trajectory = zeros(T*40,4);
+trajectory = zeros(T * 40, 4);
 begin_n = 3;
 Incret_n = 0;
-for t =1:T
-    if (A(begin_n+Incret_n) == 40)
-        trajectory((t-1)*40+1:t*40,:) = reshape(A(begin_n+Incret_n+1:begin_n+Incret_n+40*4),4,40)';
-        Incret_n = Incret_n+40*4+1;
+for t = 1:T
+    if A(begin_n + Incret_n) == 40
+        trajectory((t - 1) * 40 + 1:t * 40, :) = reshape(A(begin_n + Incret_n + 1:begin_n + Incret_n + 40 * 4), 4, 40)';
+        Incret_n = Incret_n + 40 * 4 + 1;
     else
-        trajectory((t-1)*40+1:t*40,:) = NaN;
-        Incret_n = Incret_n+80*4+1;
+        trajectory((t - 1) * 40 + 1:t * 40, :) = NaN;
+        Incret_n = Incret_n + 80 * 4 + 1;
     end
 end
 
 trajectory(isnan(trajectory)) = [];
-trajectory = trajectory(1:2:end,:);
-I=size(trajectory,1)*size(trajectory,2)/4;
-A = reshape(trajectory,20,I/20,4);
+trajectory = trajectory(1:2:end, :);
+I = size(trajectory, 1) * size(trajectory, 2) / 4;
+A = reshape(trajectory, 20, I / 20, 4);
 
-X=A(:,:,1);
-Z=A(:,:,2);
-Y=A(:,:,3)/4;
-P = A(:,:,4);
-
+X = A(:, :, 1);
+Z = A(:, :, 2);
+Y = A(:, :, 3) / 4;
+P = A(:, :, 4);
 
 % l=size(B,1)/4;
 % B=reshape(B,4,l);
 % B=B';
 % B=reshape(B,20,l/20,4);
-% 
+%
 % X=B(:,:,1);
 % Z=400-B(:,:,2);
 % Y=B(:,:,3)/4;
 % P=B(:,:,4);
 
-for s=1:size(X,2)
-    S=[X(:,s) Y(:,s) Z(:,s)];
-  
+for s = 1:size(X, 2)
+    S = [X(:, s) Y(:, s) Z(:, s)];
+
     xlim = [0 800];
     ylim = [0 800];
     zlim = [0 800];
     set(gca, 'xlim', xlim, ...
-             'ylim', ylim, ...
-             'zlim', zlim);
+        'ylim', ylim, ...
+        'zlim', zlim);
 
-    h=plot3(S(:,1),S(:,2),S(:,3),'r.');
-    %rotate(h,[0 45], -180);
-    set(gca,'DataAspectRatio',[1 1 1])
-%     axis([-1 1 -1 1 -1 1])
+    h = plot3(S(:, 1), S(:, 2), S(:, 3), 'r.');
+    % rotate(h,[0 45], -180);
+    set(gca, 'DataAspectRatio', [1 1 1])
+    %     axis([-1 1 -1 1 -1 1])
 
-
-    for j=1:19
-        c1=J(1,j);
-        c2=J(2,j);
-        line([S(c1,1) S(c2,1)], [S(c1,2) S(c2,2)], [S(c1,3) S(c2,3)]);
+    for j = 1:19
+        c1 = J(1, j);
+        c2 = J(2, j);
+        line([S(c1, 1) S(c2, 1)], [S(c1, 2) S(c2, 2)], [S(c1, 3) S(c2, 3)]);
     end
-    
-    pause(1/20)
+
+    pause(1 / 20)
 end
 
 figure(1);
-S=[X(:,1) Y(:,1) Z(:,1)];
-joints=plot3(S(:,1),S(:,2),S(:,3),'rs','markersize',10);
+S = [X(:, 1) Y(:, 1) Z(:, 1)];
+joints = plot3(S(:, 1), S(:, 2), S(:, 3), 'rs', 'markersize', 10);
 
-for j=1:19
-    c1=J(1,j);
-    c2=J(2,j);
-    plot3([S(c1,1) S(c2,1)], [S(c1,2) S(c2,2)], [S(c1,3) S(c2,3)],'-rs','LineWidth',2);hold on;
+for j = 1:19
+    c1 = J(1, j);
+    c2 = J(2, j);
+    plot3([S(c1, 1) S(c2, 1)], [S(c1, 2) S(c2, 2)], [S(c1, 3) S(c2, 3)], '-rs', 'LineWidth', 2); hold on;
 end
-S=[X(:,size(X,2)) Y(:,size(X,2)) Z(:,size(X,2))];
-joints=plot3(S(:,1),S(:,2),S(:,3),'rs','markersize',10);hold on;
-for j=1:19
-    c1=J(1,j);
-    c2=J(2,j);
-    plot3([S(c1,1) S(c2,1)], [S(c1,2) S(c2,2)], [S(c1,3) S(c2,3)],'-bs','LineWidth',2);hold on;
+S = [X(:, size(X, 2)) Y(:, size(X, 2)) Z(:, size(X, 2))];
+joints = plot3(S(:, 1), S(:, 2), S(:, 3), 'rs', 'markersize', 10); hold on;
+for j = 1:19
+    c1 = J(1, j);
+    c2 = J(2, j);
+    plot3([S(c1, 1) S(c2, 1)], [S(c1, 2) S(c2, 2)], [S(c1, 3) S(c2, 3)], '-bs', 'LineWidth', 2); hold on;
 end
-S_begin=[X(:,1) Y(:,1) Z(:,1)];
-S_end = [X(:,size(X,2)) Y(:,size(X,2)) Z(:,size(X,2))];
+S_begin = [X(:, 1) Y(:, 1) Z(:, 1)];
+S_end = [X(:, size(X, 2)) Y(:, size(X, 2)) Z(:, size(X, 2))];
 
-for j=1:size(X,2)-1
-    S=[X(:,j) Y(:,j) Z(:,j)];S_next = [X(:,j+1) Y(:,j+1) Z(:,j+1)];
+for j = 1:size(X, 2) - 1
+    S = [X(:, j) Y(:, j) Z(:, j)]; S_next = [X(:, j + 1) Y(:, j + 1) Z(:, j + 1)];
     for i = 1:20
-        axis equal;plot3([S(i,1) S_next(i,1)],[S(i,2) S_next(i,2)],[S(i,3) S_next(i,3)],'-k','LineWidth',1);hold on;
+        axis equal; plot3([S(i, 1) S_next(i, 1)], [S(i, 2) S_next(i, 2)], [S(i, 3) S_next(i, 3)], '-k', 'LineWidth', 1); hold on;
     end
 end
 
-class_num = length(unique((trainGID)));
+class_num = length(unique(trainGID));
 for i = 1:class_num
-    trajectory = TRAJDB(2,(trainGID == i));
+    trajectory = TRAJDB(2, trainGID == i);
     class_len = length(trajectory);
     for j = 1:class_len
-    plot3d(trajectory{1,j});
-    xlabel('X','FontWeight','bold');ylabel('Y','FontWeight','bold');zlabel('Z','FontWeight','bold');
-    saveas(gcf,strcat(num2str(i),'-',num2str(j)),'png')
+        plot3d(trajectory{1, j});
+        xlabel('X', 'FontWeight', 'bold'); ylabel('Y', 'FontWeight', 'bold'); zlabel('Z', 'FontWeight', 'bold');
+        saveas(gcf, strcat(num2str(i), '-', num2str(j)), 'png')
     end
 end

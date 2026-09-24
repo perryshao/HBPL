@@ -1,0 +1,17 @@
+*.m text eol=lf
+*.c text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+*.hpp text eol=lf
+*.md text eol=lf
+*.cfg text eol=lf
+*.mexw32 binary
+*.mexw64 binary
+*.mexa64 binary
+*.mexmaci64 binary
+*.mexmaca64 binary
+
+# Recovered historical originals: preserve bytes for provenance hashes.
+mex/DepthMapBinIO-src/** -text -whitespace
+mex/LogHog/src/ReadMe.txt -text -whitespace
+mex/costFuncRegMex/src/ReadMe.txt -text -whitespace

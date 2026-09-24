@@ -1,5 +1,5 @@
 function hbplSetup(dataset)
-%HBPLSETUP  Put HBPL and its dependencies on the MATLAB path.
+% HBPLSETUP  Put HBPL and its dependencies on the MATLAB path.
 %
 %   HBPLSETUP              adds the shared code and third-party toolboxes
 %   HBPLSETUP('ntu_rgbd')  additionally adds that dataset's pipeline

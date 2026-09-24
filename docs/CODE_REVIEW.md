@@ -3,19 +3,14 @@
 Reviewed 2026-09-21, covering the three dataset pipelines under `src/`
 (339 `.m` files, ~25,800 lines before the clean-up).
 
-## Verdict
+## Status of this historical review
 
-**The algorithm is implemented correctly.** The hierarchical mixed norm
-ℓ<sub>4,1,2</sub> of Eq. (13) and its analytic gradient were checked term by
-term:
-
-- ℓ<sub>4</sub> norm inside each body-part: `(Σ_d w_d^4)^(1/4)` ✓
-- ℓ<sub>1</sub> across parts, ℓ<sub>2</sub> across layers:
-  `(Σ_l (Σ_k ||w^{l,k}||_4)^2)^(1/2)` ✓
-- gradient `A_l/√(Σ A²) · w³/(Σw⁴)^(3/4)` ✓, confirmed against finite
-  differences
-
-Everything that needed fixing was engineering, not mathematics.
+These notes describe the September 21 refactor. The September 24 repository
+review found additional runtime and documentation defects, including a
+factor-of-two discrepancy in the squared variants' hierarchical gradients.
+See [POLISH_REVIEW.md](POLISH_REVIEW.md) for the current findings and checks.
+The earlier blanket claim that all algorithm variants were correct is
+withdrawn. Published accuracy has not been reproduced in this environment.
 
 ## Defects fixed
 
@@ -36,7 +31,8 @@ NTU pipeline, so a fresh clone could not work.
 
 **Fixed.** `src/common/hbplDataDir.m` resolves locations in the order
 `HBPL_BATCH_DIR` / `HBPL_RAW_DIR` environment variables → `cache/batches` and
-`data/` inside the repository. Runs with no configuration.
+`data/` inside the repository. Prepared per-joint MAT files are still required;
+the retained entry points do not preprocess raw skeletons.
 
 ### 3. `predictBinRegression` crashed on a test set smaller than one batch
 
@@ -64,18 +60,15 @@ request no outputs.
 | `GeneFisherCodeJointPyramid` encode loop | written four times (train/test × full/partial chunk) | one `encodeToChunks` |
 | Per-action Fisher encoding | scattered over four sites | `src/common/hbplFisherEncodeAction.m` |
 
-Numerical equivalence was verified: the original and refactored versions were
-each transcribed faithfully into NumPy and compared over two `partGroup`
-settings (`[5 10 19]`, `[10 20 38]`) × four variants. **The objective matched
-exactly and gradients agreed to ~1e-17** (round-off), with a finite-difference
-check confirming the analytic gradient. A static checker also verified block
-structure (`if`/`for`/`function` against `end`, bracket balance) across all 348
-`.m` files, with no findings.
+The original review reported NumPy comparisons between transcriptions of
+old and refactored functions. Those scripts were removed at the owner's
+request and are not included here. Such comparisons do not execute MATLAB
+and do not establish that the historical derivatives match the stated
+objectives. The current audit's syntax-tree checks and independent scalar
+finite-difference experiment are described in [POLISH_REVIEW.md](POLISH_REVIEW.md).
 
-That verification ran on a machine without MATLAB, so it establishes that the
-refactor did not change the arithmetic — **the full pipeline was never actually
-executed**. When you first run it on real data, check the result against the
-published 94.87 / 97.0 / 82.00.
+The full data pipeline has not been executed in this environment. The values
+94.87 / 97.0 / 82.00 are published results, not results of this maintenance run.
 
 ## Left alone, on purpose
 
@@ -125,7 +118,7 @@ convention is documented.
 
 ### `minimize.m`
 
-Carl Edward Rasmussen's 2002 L-BFGS implementation, correctly attributed,
+Carl Edward Rasmussen's 2002 nonlinear conjugate-gradient implementation, correctly attributed,
 logic untouched. It calls the objective by name through `eval(argstr)`; that is
 its design, not a defect. The three dataset folders hold identical copies —
 worth consolidating into `third_party/` at some point.
@@ -153,4 +146,6 @@ objectives referenced by name as strings inside `minimize(...)`:
 | `ut_kinect` | 23 | 72 |
 | `ntu_rgbd` | 23 | 89 |
 
-The kept set is closed under function calls, with no dangling references.
+That was the previous static-analysis conclusion. It does not establish a
+complete runtime dependency set: prepared trajectory tables, toolboxes, and
+experiment-specific model files are still required.

@@ -1,5 +1,5 @@
-%function [min_distance, d, g] = dtw_svm(A, B, orientation1,orientation2,flag,adjustment_window_size)
-function [min_distance, d, g] = dtw_svm(f1,f2)
+% function [min_distance, d, g] = dtw_svm(A, B, orientation1,orientation2,flag,adjustment_window_size)
+function [min_distance, d, g] = dtw_svm(f1, f2)
 % Minimal time normalized dtw distance between speech patterns A and B.
 
 % References:
@@ -21,47 +21,39 @@ flag = 1;
 dim_root = 2; dim_orien = 6;
 feature_m1 = f1(1);
 feature_m2 = f2(1);
-B = reshape(f1(2:dim_root*feature_m1+1),feature_m1,dim_root);
-orientation2 = reshape(f1(dim_root*feature_m1+2:...
-                dim_root*feature_m1+1+dim_orien*feature_m1),feature_m1,dim_orien);
+B = reshape(f1(2:dim_root * feature_m1 + 1), feature_m1, dim_root);
+orientation2 = reshape(f1(dim_root * feature_m1 + 2: ...
+                          dim_root * feature_m1 + 1 + dim_orien * feature_m1), feature_m1, dim_orien);
 
-A = reshape(f2(2:dim_root*feature_m2+1),feature_m2,dim_root);
-orientation1 = reshape(f2(dim_root*feature_m2+2:...
-                dim_root*feature_m2+1+dim_orien*feature_m2),feature_m2,dim_orien);
+A = reshape(f2(2:dim_root * feature_m2 + 1), feature_m2, dim_root);
+orientation1 = reshape(f2(dim_root * feature_m2 + 2: ...
+                          dim_root * feature_m2 + 1 + dim_orien * feature_m2), feature_m2, dim_orien);
 
-A = A(3:end-2,:);B = B(3:end-2,:);% because beginning and ending two features are zero
-orientation1 = orientation1(3:end-2,:);orientation2 = orientation2(3:end-2,:);
+A = A(3:end - 2, :); B = B(3:end - 2, :); % because beginning and ending two features are zero
+orientation1 = orientation1(3:end - 2, :); orientation2 = orientation2(3:end - 2, :);
 % get length of speech patterns A and B
-I = size(A,1);
-J = size(B,1);
-d = zeros(I,J);
+I = size(A, 1);
+J = size(B, 1);
+d = zeros(I, J);
 % local distance matrix
 % d = feature_dist_orien_matrix(A,B,orientation1,orientation2,flag);
-d = feature_dist_orien_matrix(A,B,orientation1,orientation2,flag);
+d = feature_dist_orien_matrix(A, B, orientation1, orientation2, flag);
 % global distance matrix
 NaN_index = isnan(d);
 
 d(NaN_index) = 0;
-I = size(d,1);J = size(d,2);
-d=double(d);
+I = size(d, 1); J = size(d, 2);
+d = double(d);
 %% search optimal path using C for acceleratting the computation
-[g,steps] = dtwpath(d,r); %#ok<NASGU>
-
+[g, steps] = dtwpath(d, r); %#ok<NASGU>
 
 % time normalize global distance matrix
-N=I+J;
-D=g/N;
-
+N = I + J;
+D = g / N;
 
 % remove additional inf padded row and column from global distance matrix
-D=D(2:end,2:end);
+D = D(2:end, 2:end);
 
 % path=traceback_path(steps);
 
 min_distance = D(end, end);
-
-
-
-
-
-

@@ -1,4 +1,4 @@
-function [f, df,ddf] = costFunc(initialTheta, X, Y, lambda,C,jointNum, preTinitialTheta)
+function [f, df, ddf] = costFunc(initialTheta, X, Y, lambda, C, jointNum, preTinitialTheta)
 
 % cosFunctionReg.m This function returns the function value, partial derivatives
 % and Hessian of the (general dimension) rosenbrock function, given by:
@@ -6,43 +6,42 @@ function [f, df,ddf] = costFunc(initialTheta, X, Y, lambda,C,jointNum, preTiniti
 % Initialize some useful values
 % Y = NxC column vector
 if nargin < 7
-	preTinitialTheta = 0;
+    preTinitialTheta = 0;
 end
 %% Compute the costJ of a particular choice of theta
 % compute cost costJ
-% X = DxN matrix, J and M is the partition paramters over joints and feature modalities
-D = size(X,1);
-J = D/jointNum; % the number of parts
+% X = DxN matrix, J and M is the partition parameters over joints and feature modalities
+D = size(X, 1);
+J = D / jointNum; % the number of parts
 % theta = DxC column vector
-theta = reshape(initialTheta,D,C);
-preTinitialTheta = reshape(preTinitialTheta,D,C);
+theta = reshape(initialTheta, D, C);
+preTinitialTheta = reshape(preTinitialTheta, D, C);
 % costJ = single number
-costJ = sum(sum((X'*theta-Y).^2));
+costJ = sum(sum((X' * theta - Y).^2));
 
-costRegularizationTerm1 = sum(sum(theta.^2,2));
+costRegularizationTerm1 = sum(sum(theta.^2, 2));
 
-%% compute the sum cost                                    
-costJWithRegularization = costJ + lambda(1)*costRegularizationTerm1;
+%% compute the sum cost
+costJWithRegularization = costJ + lambda(1) * costRegularizationTerm1;
 % Compute the partial derivatives and set gradiant to the partial
 % derivatives of the cost w.r.t. each parameter in theta
 %% compute the gradient
-gradient  = 2*X*(X'*theta-Y);
+gradient  = 2 * X * (X' * theta - Y);
 
 clear X;
 
 epsilon = 10e-8; % to avoid inf when devided by zero
-gradientRegularizationTerm1 = 2*theta;
+gradientRegularizationTerm1 = 2 * theta;
 %% compute the sum gradient
-gradient = gradient + lambda(1)*gradientRegularizationTerm1;
-
+gradient = gradient + lambda(1) * gradientRegularizationTerm1;
 
 f = costJWithRegularization;
-gradient = reshape(gradient,D*C,1); % vec(W)
+gradient = reshape(gradient, D * C, 1); % vec(W)
 
 if nargout > 1
-  df = gradient;
+    df = gradient;
 end
 
 if nargout > 2
-  ddf = ddgradient;
+    ddf = ddgradient;
 end

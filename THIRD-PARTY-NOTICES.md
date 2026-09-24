@@ -2,7 +2,8 @@
 
 The MIT licence in [`LICENSE`](LICENSE) covers the code written for this
 project, and nothing else. The files below were written by others, are vendored
-here unmodified, and keep their own terms. This list is provided in good faith;
+here with their original notices and terms. Whitespace and indentation have
+been normalized in some copies; this is not an upstream byte-identical snapshot. This list is provided in good faith;
 where a file carries no explicit licence text, the upstream project's terms
 govern.
 

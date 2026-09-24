@@ -1,82 +1,74 @@
 # MEX components
 
-Two optional C++ accelerators. **Neither is required**: the MATLAB pipeline in
-`src/` is self-contained and reproduces the published numbers without them.
+The MATLAB pipelines under `src/` use `hbplCost.m`; they do not require these
+legacy C++ components. Keep the source and prebuilt binaries for historical
+experiments, but do not substitute the MEX objectives for a MATLAB wrapper
+without checking both the interface and the regularizer.
 
-| Component | What it does | Called by |
-|---|---|---|
-| `costFuncRegMex` | Objective and gradient of the hierarchical mixed norm, Eq. (13) | an alternative to `hbplCost.m`, selected by name in `trainBinRegression*.m` |
-| `optiCostFuncRegMex` | Same objective, further hand-optimised | as above |
-| `LogHog` | Log-polar HOG descriptor | the TSSM depth baselines |
+| Component | Historical purpose |
+|---|---|
+| `costFuncRegMex` | Part/modality mixed-norm regression objective and gradient |
+| `optiCostFuncRegMex` | Vectorized implementation of that legacy objective |
+| `LogHog` | Log-polar HOG descriptor used by TSSM baselines |
 
 ## Prebuilt binaries
 
-Only the Windows builds survive from the original work. They were compiled
-against MATLAB R2014-era headers with Visual Studio 2012 (`v110`).
+The repository includes Windows x64 (`.mexw64`) binaries under
+`costFuncRegMex/bin/win64/`, `LogHog/bin/win64/`, and historical dataset
+folders. All 31 tracked binaries were preserved byte-for-byte during the
+September 2026 polish. No Linux (`.mexa64`) or macOS (`.mexmaci64`,
+`.mexmaca64`) binaries are present in this checkout.
 
-| Platform | File | Status |
-|---|---|---|
-| Windows x64 | `costFuncRegMex/bin/win64/costFuncRegMex.mexw64` | shipped |
-| Windows x64 | `costFuncRegMex/bin/win64/optiCostFuncRegMex.mexw64` | shipped |
-| Windows x64 | `LogHog/bin/win64/LogHog.mexw64` | shipped |
-| Linux x64 | `*.mexa64` | **not available** -- build from source |
-| macOS Intel | `*.mexmaci64` | **not available** -- build from source |
-| macOS Apple silicon | `*.mexmaca64` | **not available** -- build from source |
+These are historical builds. Their compatibility with the current MATLAB
+release has not been tested. Source edits do not update a prebuilt binary;
+rebuild with a compatible compiler and MATLAB environment when needed.
 
-The Linux and macOS binaries were never produced, or did not survive; the
-source is here, so they can be built in one command.
+## Source interface
 
-MEX binaries are ABI-tied to the MATLAB release that compiled them. A
-`.mexw64` from 2014 may refuse to load under a much newer MATLAB, in which
-case rebuild rather than file a bug.
-
-## Building
-
-From MATLAB, in this directory:
+Both cost-function entry points read **eight inputs**:
 
 ```matlab
-mex costFuncRegMex/src/costFuncRegMex.cpp     -outdir costFuncRegMex/bin
-mex costFuncRegMex/src/optiCostFuncRegMex.cpp -outdir costFuncRegMex/bin
+[f, df] = costFuncRegMex(theta, X, Y, lambda, classNum, ...
+                        jointNum, modalityNum, priorTheta);
 ```
 
-`LogHog` additionally needs OpenCV, which it reaches through the bundled
-`mexopencv` headers (`MxArray.hpp`, `mexopencv.hpp`):
+`theta` and `priorTheta` are column-major weight vectors, `X` is D-by-N,
+`Y` is N-by-classNum, and `lambda` contains three weights. The C++ source
+assumes real, full double arrays, positive integral partition counts, and
+matching dimensions. It reads all inputs and writes both outputs without
+validating the argument counts or array types. Inspect the source and supply
+both outputs; invalid calls can crash MATLAB.
 
-```matlab
-mex LogHog/src/LogHog.cpp LogHog/src/MxArray.cpp -ILogHog/src ...
-    -I/usr/local/include/opencv4 -L/usr/local/lib ...
-    -lopencv_core -lopencv_imgproc -outdir LogHog/bin
-```
+This is **not** the seven-argument `costFuncRegMultPartGp_v2` interface. The
+C++ regularizer partitions weights by joint and modality and does not use
+`partGroup` to couple three body-part layers. Numerical equality with
+`hbplCost` is therefore not expected. The earlier seven-argument comparison
+example was invalid and has been removed.
 
-Adjust the OpenCV include and library paths for your installation. On Windows
-the Visual Studio projects (`*.vcxproj`, `*.sln`) are also included; they
-expect `MATLABROOT` to resolve and were last opened with VS2012.
+## Building from source
 
-Put the resulting binary somewhere on the MATLAB path -- the dataset folders
-under `src/` are the usual place, and already hold the Windows copies.
+All three components depend on OpenCV as well as the MATLAB MEX headers.
+The cost-function sources include legacy OpenCV headers and constants;
+`LogHog` additionally includes the Windows `stdafx.h`/`targetver.h` chain.
+The Visual Studio projects describe the original build environment.
 
-## Verifying a build
+A Linux, macOS, or current-OpenCV port requires adapting those includes,
+compiler settings, and API calls. No portable build command has been verified
+in this checkout. The previous instructions omitted required OpenCV flags
+for the cost functions and Windows-specific dependencies for `LogHog`.
 
-The MEX objective must agree with the MATLAB one. After building, compare them
-on random input:
-
-```matlab
-hbplSetup('msr_action3d')
-D = 102; C = 4; N = 7; partGroup = [5 10 19];
-X = randn(D, N);  Y = full(sparse(1:N, randi(C, 1, N), 1, N, C));
-w = randn(D*C, 1);  lambda = [0.001 0.2 0.05];
-[f1, g1] = costFuncRegMultPartGp_v2(w, X, Y, lambda, C, sum(partGroup), zeros(D*C,1));
-[f2, g2] = costFuncRegMex(          w, X, Y, lambda, C, sum(partGroup), zeros(D*C,1));
-fprintf('objective %.3e   gradient %.3e\n', abs(f1-f2), max(abs(g1-g2)));
-```
-
-Both differences should be at round-off level. Note that `costFuncRegMex`
-predates the `_v2` variant, so check which mixed norm it implements before
-reading a mismatch as a bug -- see `docs/CODE_REVIEW.md` on the `_v1` / `_v2`
-distinction.
+Before using a rebuilt library, compare its values and gradients against the
+matching historical MATLAB objective on valid inputs. Do not use the
+three-layer `_v2` objective as a reference for the part/modality MEX objective.
 
 ## Third-party code
 
-`LogHog/src/MxArray.{hpp,cpp}` and `mexopencv.hpp` come from
-[mexopencv](https://github.com/kyamagu/mexopencv) by Kota Yamaguchi,
-BSD licensed. They are vendored unmodified.
+`LogHog/src/MxArray.{hpp,cpp}`, `mexopencv.hpp`, and
+`mexopencv_features2d.hpp` originate from
+[mexopencv](https://github.com/kyamagu/mexopencv) by Kota Yamaguchi.
+Their copyright and licence notices are retained; see
+[THIRD-PARTY-NOTICES.md](../THIRD-PARTY-NOTICES.md).
+
+## Recovered depth reader
+
+Original DepthMapBinIO sources and project files are in `DepthMapBinIO-src/`. See [recovery notes](../docs/MEX_RECOVERY.md). The current binary is unchanged and the recovered source has not been rebuilt.
