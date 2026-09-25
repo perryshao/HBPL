@@ -34,10 +34,10 @@ Both cost-function entry points read **eight inputs**:
 
 `theta` and `priorTheta` are column-major weight vectors, `X` is D-by-N,
 `Y` is N-by-classNum, and `lambda` contains three weights. The C++ source
-assumes real, full double arrays, positive integral partition counts, and
-matching dimensions. It reads all inputs and writes both outputs without
-validating the argument counts or array types. Inspect the source and supply
-both outputs; invalid calls can crash MATLAB.
+now checks real, full, finite double arrays, positive integral partition counts,
+compatible dimensions and integer bounds. Request exactly eight inputs and both
+outputs; invalid calls raise `HBPL:cost*` errors before buffers are accessed.
+The old binaries lack these guards and can still crash on invalid calls.
 
 This is **not** the seven-argument `costFuncRegMultPartGp_v2` interface. The
 C++ regularizer partitions weights by joint and modality and does not use
@@ -52,10 +52,12 @@ The cost-function sources include legacy OpenCV headers and constants;
 `LogHog` additionally includes the Windows `stdafx.h`/`targetver.h` chain.
 The Visual Studio projects describe the original build environment.
 
-A Linux, macOS, or current-OpenCV port requires adapting those includes,
-compiler settings, and API calls. No portable build command has been verified
-in this checkout. The previous instructions omitted required OpenCV flags
-for the cost functions and Windows-specific dependencies for `LogHog`.
+The two cost-function sources were built with OpenCV 4.13.0 and C++17 for native
+sanitizers and Octave 10.3.0 MEX execution. The local build provides compatibility
+`matrix.h`/`mat.h` includes and defines `CV_REDUCE_SUM=cv::REDUCE_SUM`; see
+[the runtime report](../docs/RUNTIME_VALIDATION.md) for coverage and local scripts.
+This does not validate a MATLAB build or its ABI. LogHog still needs an API port:
+its `FilterEngine`/`createLinearFilter` calls are unavailable in that OpenCV version.
 
 Before using a rebuilt library, compare its values and gradients against the
 matching historical MATLAB objective on valid inputs. Do not use the

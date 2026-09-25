@@ -1,5 +1,9 @@
 # Repository polish and review — 2026-09-24
 
+Subsequent original-code execution and runtime fixes are documented in
+[RUNTIME_VALIDATION.md](RUNTIME_VALIDATION.md). Validation statements below
+describe the initial polish pass unless explicitly updated.
+
 ## Scope and baseline
 
 The working repository is `HBPL` on branch `main`, based on `a8ba15c`.
@@ -113,14 +117,17 @@ entry points do not build those tables from raw skeletons. VLFeat is required
 for Fisher encoding; the RRV descriptors also call `vrrotvec` and
 `vrrotvec2mat`, which must be available in the MATLAB installation.
 
-### High: legacy MEX interface is unchecked and implements another penalty
+### High: legacy MEX uses another penalty; historical binaries are unchecked
 
-The C++ objective reads eight inputs and writes two outputs without checking
-counts, classes, sparsity, or dimensions. An invalid call can crash MATLAB.
+The initial C++ objective read eight inputs and wrote two outputs without checking
+counts, classes, sparsity, or dimensions. The 2026-09-25 runtime pass reproduced
+an output-buffer overrun and added source-level contract guards. Historical
+prebuilt binaries are unchanged and remain unchecked; rebuild before using the fix.
 Its joint/modality penalty has no three-layer `partGroup` aggregation. The
 previous seven-argument equivalence example was removed. The sources also
 require OpenCV, and LogHog retains Windows-specific precompiled-header
-includes. Portable compilation has not been established.
+includes. The runtime follow-up builds the two cost objectives for Octave and
+native sanitizers; LogHog still requires an API port.
 
 ### Medium: archived experiments retain historical execution assumptions
 

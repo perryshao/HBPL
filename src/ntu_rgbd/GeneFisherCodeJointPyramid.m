@@ -69,7 +69,9 @@ else
     PcaM = zeros(3, 3);
 end
 
-[means, covariances, priors] = vl_gmm(X, numClusters);
+% VLFeat 0.9.20 writes the fifth output slot even when fewer are requested.
+% Request every output to avoid an out-of-bounds write in its legacy MEX gateway.
+[means, covariances, priors, ~, ~] = vl_gmm(X, numClusters);
 clear X
 
 modelForTest = struct('covariances', covariances, 'means', means, ...

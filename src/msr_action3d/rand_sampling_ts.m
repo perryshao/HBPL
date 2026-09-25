@@ -12,8 +12,13 @@ cnt = 0;
 for ii = 1:num_training,
     num_fea = size(TRAJDB_DES{1, ii}, 1);
     rndidx = randperm(num_fea);
-    if num_per_training > max(rndidx)
-        rndidx = [rndidx rndidx(1:num_per_training - max(rndidx))];
+    if num_fea == 0
+        error('rand_sampling_ts:emptyClip', 'Cannot sample an empty descriptor clip.');
+    end
+    % Repeat the shuffled cycle when a small clip cannot fill the sample quota.
+    % For quotas up to two cycles, this preserves the historical ordering.
+    if num_per_training > num_fea
+        rndidx = repmat(rndidx, 1, ceil(num_per_training / num_fea));
     end
     X(:, cnt + 1:cnt + num_per_training) = TRAJDB_DES{1, ii}(rndidx(1:num_per_training), :)';
     cnt = cnt + num_per_training;

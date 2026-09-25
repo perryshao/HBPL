@@ -1,3 +1,4 @@
+#include "hbplMexInputs.h"
 #include <math.h>
 #include <mex.h>
 #include <matrix.h>
@@ -34,6 +35,7 @@ Mat matToCvMat(const mxArray *arrayPtr)
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
+    hbplValidateCostInputs(nlhs, nrhs, prhs);
     /* parse input arguments*/
     Mat thetaCol = matToCvMat(prhs[0]);
     Mat X = matToCvMat(prhs[1]);
@@ -48,7 +50,7 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
     // Legacy part/modality regularizer; this is not the three-layer hbplCost.
     // Inputs: theta, X (D x N), Y (N x C), lambda, C, jointNum,
     // modalityNum, priorTheta. The caller must request both f and df.
-    // This historical entry point has no argument validation.
+    // Validate the legacy buffer contract before running the preserved equations.
 
     int D = X.rows;
     int N = X.cols;

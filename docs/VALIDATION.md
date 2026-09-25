@@ -1,5 +1,9 @@
 # Cross-language validation — 2026-09-24
 
+Follow-up: [RUNTIME_VALIDATION.md](RUNTIME_VALIDATION.md) adds original-code
+Octave execution and native sanitizer checks on 2026-09-25. The measurements
+below describe the earlier source-AST/substitute-pipeline run.
+
 The maintained HBPL paths passed the checks below without a MATLAB or Octave
 runtime. This follows the Cross-View-Learning review strategy: static checks,
 source-derived execution with explicit dependency bridges, independent numerical
