@@ -1,46 +1,48 @@
-#include <iostream>
-#include "stdafx.h"
 #include "log_hogcalculator.h"
+#include <mex.h>
+#include <climits>
+#include <cmath>
+#include <exception>
+#include <cstdio>
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[])
 {
-    /* parse input arguments*/
-    double *imgData = mxGetPr(prhs[0]);
-    int m = mxGetM(prhs[0]);
-    int n = mxGetN(prhs[0]);
-    // transfer mxArray to Mat in opencv
-    Mat image(m, n, CV_64F);
-    //image = MxArray(prhs[0]).toMat(CV_32F,false);
+    if (nrhs != 1 || nlhs != 1)
+        mexErrMsgIdAndTxt("HBPL:LogHogArity", "LogHog requires one input and one output.");
+    const mxArray *input = prhs[0];
+    if (!mxIsDouble(input) || mxIsComplex(input) || mxIsSparse(input) ||
+        mxGetNumberOfDimensions(input) != 2 || mxGetM(input) == 0 || mxGetM(input) != mxGetN(input))
+        mexErrMsgIdAndTxt("HBPL:LogHogType",
+                          "Input must be a nonempty real full square double matrix.");
+    if (mxGetNumberOfElements(input) > INT_MAX)
+        mexErrMsgIdAndTxt("HBPL:LogHogSize", "Image exceeds integer index limits.");
+    const double *pixels = mxGetPr(input);
+    for (mwSize i = 0; i < mxGetNumberOfElements(input); ++i)
+        if (!std::isfinite(pixels[i]))
+            mexErrMsgIdAndTxt("HBPL:LogHogFinite", "Image values must be finite.");
 
-    for (int i = 0; i < m; i++)
+    // Catch C++ failures after temporary OpenCV buffers have been unwound.
+    char failure[1024] = {};
+    try
     {
-        for (int j = 0; j < n; j++)
-        {
-            image.at<double>(i, j) = imgData[j * m + i];
-        }
+        const int size = static_cast<int>(mxGetM(input));
+        cv::Mat image(size, size, CV_64F);
+        for (int row = 0; row < size; ++row)
+            for (int col = 0; col < size; ++col)
+                image.at<double>(row, col) = pixels[col * size + row];
+
+        LogHogCalculator calculator(30, 8, 4, 6, "unsigned", 4);
+        cv::Mat descriptor = calculator.ExtractHogsDiagonal(image);
+        plhs[0] = mxCreateDoubleMatrix(descriptor.rows, descriptor.cols, mxREAL);
+        double *output = mxGetPr(plhs[0]);
+        for (int row = 0; row < descriptor.rows; ++row)
+            for (int col = 0; col < descriptor.cols; ++col)
+                output[col * descriptor.rows + row] = descriptor.at<double>(row, col);
     }
-
-    // radius = 30; nbins_theta = 8; nbins_r = 4; nthet = 6; issigned = "unsigned" normmethod = l2hys;
-    LogHogCalculator getLogHog(30, 8, 4, 6, "unsigned", 4);
-    Mat LogHog = getLogHog.ExtractHogsDiagonal(image);
-
-    //int h = LogHog.rows;
-    //int w = LogHog.cols;
-    //plhs[0] = mxCreateNumericMatrix(h, w,mxSINGLE_CLASS, mxREAL);
-    //plhs[0] = MxArray(image);
-
-    //Mat LogHog = image;
-
-    int h = LogHog.rows;
-    int w = LogHog.cols;
-    double *output;
-    plhs[0] = mxCreateNumericMatrix(h, w, mxDOUBLE_CLASS, mxREAL);
-    output = mxGetPr(plhs[0]);
-    for (int i = 0; i < h; i++)
+    catch (const std::exception &error)
     {
-        for (int j = 0; j < w; j++)
-        {
-            output[j * h + i] = LogHog.at<double>(i, j);
-        }
+        std::snprintf(failure, sizeof(failure), "%s", error.what());
     }
+    if (failure[0] != '\0')
+        mexErrMsgIdAndTxt("HBPL:LogHogComputation", "%s", failure);
 }

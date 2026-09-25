@@ -210,7 +210,9 @@ source-derived Python checks, native VLFeat Fisher comparisons, and three bounde
 pipeline smoke runs. These do not replace full MATLAB experiment validation.
 [docs/RUNTIME_VALIDATION.md](docs/RUNTIME_VALIDATION.md) extends this with actual
 Octave execution, compiled VLFeat and C++ ASan/UBSan checks, including runtime
-fixes found on 2026-09-25. Full MATLAB benchmark reproduction remains unverified.
+fixes found on 2026-09-25. [docs/LOGHOG_PORT.md](docs/LOGHOG_PORT.md) documents
+the OpenCV 4 LogHog port, build helper and rebuilt Octave MEX validation.
+Full MATLAB benchmark reproduction remains unverified.
 Formatter settings are in `.editorconfig`,
 `miss_hit.cfg`, and `.clang-format`. MATLAB checks use
 [MISS_HIT](https://misshit.org/tools.html) 0.9.44:

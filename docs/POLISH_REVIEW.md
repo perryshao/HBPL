@@ -125,9 +125,11 @@ an output-buffer overrun and added source-level contract guards. Historical
 prebuilt binaries are unchanged and remain unchecked; rebuild before using the fix.
 Its joint/modality penalty has no three-layer `partGroup` aggregation. The
 previous seven-argument equivalence example was removed. The sources also
-require OpenCV, and LogHog retains Windows-specific precompiled-header
-includes. The runtime follow-up builds the two cost objectives for Octave and
-native sanitizers; LogHog still requires an API port.
+require OpenCV. The runtime follow-up builds the two cost objectives for Octave
+and native sanitizers. The subsequent [LogHog port](LOGHOG_PORT.md) removes its
+Windows-specific precompiled-header dependency, replaces the unavailable filter
+API, and validates a rebuilt Octave MEX plus native sanitizer executables. The
+31 historical Windows binaries are still unchanged.
 
 ### Medium: archived experiments retain historical execution assumptions
 

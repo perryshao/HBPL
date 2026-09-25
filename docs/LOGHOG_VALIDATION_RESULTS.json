@@ -1,0 +1,97 @@
+{
+  "date": "2026-09-25",
+  "baseline_commit": "c7c3a7b71f4d3234a5718743dab58ab37c3596dc",
+  "scope": "OpenCV 4 LogHog port; bounded numerical, sanitizer and actual Octave MEX checks",
+  "environment": {
+    "opencv": "4.13.0",
+    "octave": "10.3.0",
+    "compiler": "Apple clang 21.0.0",
+    "architecture": "arm64",
+    "cpp_standard": "C++17",
+    "asan_ubsan": true,
+    "asan_detect_leaks": false,
+    "opencv_instrumented": false,
+    "matlab_available": false
+  },
+  "results": {
+    "sanitizer": {
+      "valid_cases": 42,
+      "invalid_cases": 12,
+      "ASan_UBSan": "pass"
+    },
+    "reference": {
+      "preserved_cpp_arithmetic_with_direct_filter_oracle": {
+        "cases": 42,
+        "max_absolute_error": 0.0
+      },
+      "numpy_histogram_with_shared_cv_polar": {
+        "cases": 30,
+        "max_absolute_error": 2.6277572237609625e-07,
+        "atol": 1e-06,
+        "rtol": 1e-06
+      },
+      "independent_numpy_exact_atan2": {
+        "cases": 30,
+        "max_absolute_error": 0.58014512420693,
+        "equivalence": false,
+        "reason": "Exact atan2 and the preserved OpenCV fast-angle implementation can choose different unsigned endpoint bins on constant images."
+      },
+      "limitation": "The reference retains original descriptor arithmetic and OpenCV 4.13 angle primitives; its filter uses independent scalar zero-border differences. It is not an OpenCV 2.x binary comparison."
+    },
+    "octave": {
+      "fixture_count": 45,
+      "invalid_calls": 11,
+      "max_absolute_error": 8.933380893361154e-08,
+      "binary": "/Users/perryshao/Documents/Projects/HBPL/cache/loghog-octave/LogHog.mex",
+      "passed": true
+    }
+  },
+  "static_checks": {
+    "MISS_HIT_style": "pass: build_loghog.m",
+    "MISS_HIT_lint": "pass: build_loghog.m",
+    "clang_format": "pass: three changed C++/header files"
+  },
+  "source_sha256": {
+    "mex/LogHog/src/LogHog.cpp": "1c2386b5dd1c595ddc47fe5ec7d7212d40058149b4251200a5df18172462340a",
+    "mex/LogHog/src/log_hogcalculator.cpp": "12f71087eab601857a9d895b6ff1e5d364cc2dd00cd9766da652cab052d550ce",
+    "mex/LogHog/src/log_hogcalculator.h": "e32090b4c10124cf465a3161a4e0ec43fd0ff734fa88a6ac2f28b2f1cd0d4581",
+    "mex/LogHog/build_loghog.m": "5bbf086281353413e1ff564621ccad983488d763161e23530945abdb8704b2a8"
+  },
+  "local_artifact_directory": "~/Documents/ChatGPT/\u65e7\u9879\u76ee\u6574\u7406/HBPL-loghog-validation-20260925",
+  "local_artifact_sha256": {
+    "build.py": "e21e80816a53eb1ef05747f773f52853be5284f9facab72925654449115c4861",
+    "check_reference.py": "c9bbb9c15c697d03f712581a2c763118725249532bdd5b4c60dd5e7f14b9be9d",
+    "reference.py": "eaae516f96eb27f8ecdacad5cf75b3556c7ca896a742bc53ee4a9b63b0ae7a83",
+    "make_octave_fixtures.py": "fb27ed7b98867e474083710e7bab2a531d3188170a739d1b66f585d4f6f4f8ff",
+    "check_octave.m": "4a11ab141c0ad117c2d248d5542a8e11815aa4f9116964a778d488500a15f635",
+    "run_octave.py": "55693b9c1bfebe352ef3ad413206cba55fbc4f83ce73bfaec292d008a6c8d2bc",
+    "native/mex.h": "f817514c29ad7c4630623a2c70ebf068cb9b5ff1e6c2a1a9a1b9cd070874f897",
+    "native/check.cpp": "1a912a9251e1a1426e63038ac820ef368edc0712336fab17657e56b74d686e72",
+    "native/polar.cpp": "dcc249d65c105f0b98230cfa55940e63f36acf4a85d0087f9cb13c22b73a60b7",
+    "native/original_LogHog.cpp": "2cf4e4838c3ca0e574bec74efab95e82c9adc06983f0bd80261221d57e8e8ade",
+    "native/original_log_hogcalculator.cpp": "793249bdb11b13bb0956e20f7f0035b5cecf593f64e42e3bb76ae32e67ec3495",
+    "native/original_log_hogcalculator.h": "58bb654ce088fd2a0a5ee872d8d85f0d6596aeeace1596d74c04dd82c8c9f6b3",
+    "build/polar.dylib": "b22f00de53b9e349acac0a6d3c18f917933f936d00a84be1f0130012fc09863b",
+    "fixtures.mat": "70e6b1cb69501a67110f1d8b642356eb6d607bc2f61d3e83925f5827d452869b",
+    "real-data-manifest.json": "acd554d696c649ff6700ee6a99abd5d590ca28f760e54f73dd2317369e84ec9f",
+    "sanitizer-results.json": "c5ec9b580263954f9407ccda984dc8fd7047c72a2c57e51d940c2c72fe045d5e",
+    "reference-results.json": "7eb52885ff9c956cc140ff53bf9441ded5e1f39c3e2ef4692bcc29bd95bc4700",
+    "octave-results.json": "9615bef545d33f4fb020009a196c4df4845540db8cd9051cc03f629633d1fe2c",
+    "native-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "octave-build.log": "dc9454a552a656bd9b4a5979950865ae58453245aec7631344c46e955428ad0d",
+    "octave.log": "fe52cc6a77cccb32914ba627d5b9148fc8f4c7d685bf7c38c5063176fe524e34",
+    "legacy-build.log": "e66b97a083156d19df9e30ae78c5f6ec3ba0d5572d8fe5e41c8756ad933ba55a",
+    "report.py": "6a2fcbaf5b3cb0b9ff3fbfb20c9ccb0c16b0d4f549e306c24bce46596378f673"
+  },
+  "reused_octave_environment_sha256": "0430b3f6be99c731dbcaa741af22284323006f9ac7e5cc78cce94e91900fe3ed",
+  "rebuilt_octave_mex_sha256": "1abc420be8ea745871f9ba719ef38481c48f4e5c478de856f2d6c97582f03867",
+  "limits": [
+    "MATLAB branch and ABI not executed",
+    "Old Windows MEX binaries not executed or replaced",
+    "Not an OpenCV 2 runtime comparison",
+    "Exact atan2 reference is not equivalent; passing NumPy histogram comparison shares OpenCV polar conversion",
+    "Prebuilt OpenCV not sanitizer-instrumented; leak detection disabled",
+    "No full TSSM training or published benchmark reproduction",
+    "Local Octave module depends on temporary OpenCV/Octave prefixes"
+  ]
+}

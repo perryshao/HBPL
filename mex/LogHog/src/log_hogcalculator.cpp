@@ -1,5 +1,11 @@
-#include "stdafx.h"
 #include "log_hogcalculator.h"
+#include <cmath>
+#include <climits>
+#include <cstdio>
+#include <opencv2/imgproc.hpp>
+
+using namespace cv;
+const double PI = 3.1415926535897932384626433832795;
 
 LogHogCalculator::LogHogCalculator()
 {
@@ -12,7 +18,7 @@ LogHogCalculator::LogHogCalculator()
 }
 
 LogHogCalculator::LogHogCalculator(double r, int theta_bins, int r_bins, int nthet_bins,
-                                   char *issignedFlag, int normFlag)
+                                   const char *issignedFlag, int normFlag)
 {
     radius = r;
     nbins_theta = theta_bins;
@@ -26,9 +32,22 @@ LogHogCalculator::~LogHogCalculator() {}
 
 cv::Mat LogHogCalculator::ExtractHogsDiagonal(cv::Mat img)
 {
+    // LogHog operates on a square self-similarity image.
+    if (img.empty() || img.dims != 2 || img.type() != CV_64FC1 || img.rows != img.cols)
+        CV_Error(Error::StsBadArg, "LogHog requires a nonempty square CV_64FC1 image.");
+    if (img.rows > INT_MAX / img.rows || !checkRange(img))
+        CV_Error(Error::StsOutOfRange, "Image size or values exceed the supported range.");
+    // Validate products before passing sizes to OpenCV's integer dimensions.
+    if (!std::isfinite(radius) || radius <= 1 || nbins_theta < 1 || nbins_r < 2 || nthet < 1 ||
+        nbins_theta > INT_MAX - 2 || nbins_r > INT_MAX - 2 || nthet > INT_MAX - 2 ||
+        normmethod < 0 || normmethod > 4 || (issigned != "unsigned" && issigned != "signed"))
+        CV_Error(Error::StsBadArg, "Invalid LogHog configuration.");
+    const long long bins2d = static_cast<long long>(nbins_theta + 2) * (nbins_r + 2);
+    if (bins2d > INT_MAX / (nthet + 2) ||
+        static_cast<long long>(img.rows) * nbins_theta > INT_MAX / nbins_r / nthet)
+        CV_Error(Error::StsOutOfRange, "Histogram dimensions exceed integer index limits.");
     double celltheta = PI / nbins_theta;
     double cellro = log(radius) / nbins_r;
-    // check parameters's validity.
     int M = img.rows;
     int N = img.cols;
     //construct the indx matrix
@@ -50,29 +69,28 @@ cv::Mat LogHogCalculator::ExtractHogsDiagonal(cv::Mat img)
     Mat gradscal;
     int ksize = 3;
     Mat kernel(ksize, ksize, CV_64F, Scalar(0));
+    // Correlation with the original kernel, centered anchor and zero border.
     // filter rows first
     kernel.at<double>(1, 0) = -1;
     kernel.at<double>(1, 1) = 0;
     kernel.at<double>(1, 2) = 1;
-    Ptr<FilterEngine> LinearFilter1 = createLinearFilter(
-        img.type(), gradscalx.type(), kernel, Point(-1, -1), 0, BORDER_CONSTANT, -1, Scalar());
-    LinearFilter1->apply(img, gradscalx, Rect(0, 0, -1, -1), Point(0, 0), false);
+    cv::filter2D(img, gradscalx, CV_64F, kernel, Point(-1, -1), 0, BORDER_CONSTANT);
     // filter columns sencond
     kernel.setTo(0);
     kernel.at<double>(0, 1) = 1;
     kernel.at<double>(1, 1) = 0;
     kernel.at<double>(2, 1) = -1;
-    Ptr<FilterEngine> LinearFilter2 = createLinearFilter(
-        img.type(), gradscaly.type(), kernel, Point(-1, -1), 0, BORDER_CONSTANT, -1, Scalar());
-    LinearFilter2->apply(img, gradscaly, Rect(0, 0, -1, -1), Point(0, 0), false);
+    cv::filter2D(img, gradscaly, CV_64F, kernel, Point(-1, -1), 0, BORDER_CONSTANT);
     // calculate gradient orientation matrix.
     // plus small number for avoiding dividing zero.
     Mat gradscalxplus = gradscalx + Mat(gradscalx.rows, gradscalx.cols, CV_64F, Scalar(0.0001));
     Mat gradorient;
     cv::cartToPolar(gradscalx, gradscaly, gradscal, gradorient,
                     false); // orientation will fall into [0-2*PI]
+    if (!checkRange(gradscal) || !checkRange(gradorient))
+        CV_Error(Error::StsOutOfRange, "Image gradients overflowed the finite range.");
     // unsigned situation: orientation region is 0 to pi.
-    int or = 0;
+    int orientationRange = 0;
 
     //test the maximum and minimum in gradorient
     /*
@@ -82,7 +100,7 @@ cv::Mat LogHogCalculator::ExtractHogsDiagonal(cv::Mat img)
      minMaxLoc(gradorient, &minVal, &maxVal, &minLoc, &maxLoc);
      */
 
-    if (strcmp(issigned, "unsigned") == 0)
+    if (issigned == "unsigned")
     {
         Mat dist_flag = gradorient > PI;
         for (int i = 0; i < dist_flag.rows; i++)
@@ -91,9 +109,9 @@ cv::Mat LogHogCalculator::ExtractHogsDiagonal(cv::Mat img)
                 if (dist_flag.at<uchar>(i, j) == 255)
                     gradorient.at<double>(i, j) = gradorient.at<double>(i, j) - PI;
             }
-        or = 1;
+        orientationRange = 1;
     }
-    else if (strcmp(issigned, "signed") == 0)
+    else if (issigned == "signed")
     {
         /*
             for (int i=0;i<dist_flag.rows;i++)
@@ -103,7 +121,7 @@ cv::Mat LogHogCalculator::ExtractHogsDiagonal(cv::Mat img)
                         gradorient.at<double>(i,j) = gradorient.at<double>(i,j) + 2*PI;
                 }
             */
-        or = 2;
+        orientationRange = 2;
     }
     else
         printf("%s\n", "Incorrect ISSIGNED parameter.");
@@ -193,7 +211,9 @@ cv::Mat LogHogCalculator::ExtractHogsDiagonal(cv::Mat img)
 
             binx1 = floor((jorbj + cellro / 2) / cellro) + 1;
             biny1 = floor((iorbi + celltheta / 2) / celltheta) + 1;
-            binz1 = floor((go + (or *PI / nthet) / 2) / (or *PI / nthet)) + 1;
+            binz1 = floor((go + (orientationRange * PI / nthet) / 2) /
+                          (orientationRange * PI / nthet)) +
+                    1;
 
             if (gs < 1E-5)
                 continue;
@@ -204,46 +224,46 @@ cv::Mat LogHogCalculator::ExtractHogsDiagonal(cv::Mat img)
 
             x1 = (binx1 - 1.5) * cellro; // don't need add 0.5 here
             y1 = (biny1 - 1.5) * celltheta;
-            z1 = (binz1 - 1.5) * (or *PI / nthet);
+            z1 = (binz1 - 1.5) * (orientationRange * PI / nthet);
 
             // trillinear interpolation
             hist3dbig.at<double>(biny1 - 1, binx1 - 1, binz1 - 1) =
                 hist3dbig.at<double>(biny1 - 1, binx1 - 1, binz1 - 1) +
                 gs * (1 - (jorbj - x1) / cellro) * (1 - (iorbi - y1) / celltheta) *
-                    (1 - (go - z1) / (or *PI / nthet));
+                    (1 - (go - z1) / (orientationRange * PI / nthet));
             hist3dbig.at<double>(biny1 - 1, binx1 - 1, binz2 - 1) =
                 hist3dbig.at<double>(biny1 - 1, binx1 - 1, binz2 - 1) +
                 gs * (1 - (jorbj - x1) / cellro) * (1 - (iorbi - y1) / celltheta) *
-                    ((go - z1) / (or *PI / nthet));
+                    ((go - z1) / (orientationRange * PI / nthet));
             hist3dbig.at<double>(biny2 - 1, binx1 - 1, binz1 - 1) =
                 hist3dbig.at<double>(biny2 - 1, binx1 - 1, binz1 - 1) +
                 gs * (1 - (jorbj - x1) / cellro) * ((iorbi - y1) / celltheta) *
-                    (1 - (go - z1) / (or *PI / nthet));
+                    (1 - (go - z1) / (orientationRange * PI / nthet));
             hist3dbig.at<double>(biny2 - 1, binx1 - 1, binz2 - 1) =
                 hist3dbig.at<double>(biny2 - 1, binx1 - 1, binz2 - 1) +
                 gs * (1 - (jorbj - x1) / cellro) * ((iorbi - y1) / celltheta) *
-                    ((go - z1) / (or *PI / nthet));
+                    ((go - z1) / (orientationRange * PI / nthet));
             hist3dbig.at<double>(biny1 - 1, binx2 - 1, binz1 - 1) =
                 hist3dbig.at<double>(biny1 - 1, binx2 - 1, binz1 - 1) +
                 gs * ((jorbj - x1) / cellro) * (1 - (iorbi - y1) / celltheta) *
-                    (1 - (go - z1) / (or *PI / nthet));
+                    (1 - (go - z1) / (orientationRange * PI / nthet));
             hist3dbig.at<double>(biny1 - 1, binx2 - 1, binz2 - 1) =
                 hist3dbig.at<double>(biny1 - 1, binx2 - 1, binz2 - 1) +
                 gs * ((jorbj - x1) / cellro) * (1 - (iorbi - y1) / celltheta) *
-                    ((go - z1) / (or *PI / nthet));
+                    ((go - z1) / (orientationRange * PI / nthet));
             hist3dbig.at<double>(biny2 - 1, binx2 - 1, binz1 - 1) =
                 hist3dbig.at<double>(biny2 - 1, binx2 - 1, binz1 - 1) +
                 gs * ((jorbj - x1) / cellro) * ((iorbi - y1) / celltheta) *
-                    (1 - (go - z1) / (or *PI / nthet));
+                    (1 - (go - z1) / (orientationRange * PI / nthet));
             hist3dbig.at<double>(biny2 - 1, binx2 - 1, binz2 - 1) =
                 hist3dbig.at<double>(biny2 - 1, binx2 - 1, binz2 - 1) +
                 gs * ((jorbj - x1) / cellro) * ((iorbi - y1) / celltheta) *
-                    ((go - z1) / (or *PI / nthet));
+                    ((go - z1) / (orientationRange * PI / nthet));
         }
 
         // In the local interpolate condition. F is generated in this block
         // slide loop. hist3dbig should be cleared in each loop.
-        if (or == 2)
+        if (orientationRange == 2)
         {
             for (int i = 0; i < sizeOfhist3dbig[0]; i++)
                 for (int j = 0; j < sizeOfhist3dbig[1]; j++)

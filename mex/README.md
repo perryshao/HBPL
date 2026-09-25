@@ -47,17 +47,24 @@ example was invalid and has been removed.
 
 ## Building from source
 
-All three components depend on OpenCV as well as the MATLAB MEX headers.
-The cost-function sources include legacy OpenCV headers and constants;
-`LogHog` additionally includes the Windows `stdafx.h`/`targetver.h` chain.
-The Visual Studio projects describe the original build environment.
+All three components depend on OpenCV and a MATLAB or Octave MEX toolchain.
+The cost-function sources include legacy OpenCV headers and constants. The
+Visual Studio projects describe the original build environment; the current
+LogHog sources no longer require their Windows precompiled-header chain.
 
 The two cost-function sources were built with OpenCV 4.13.0 and C++17 for native
 sanitizers and Octave 10.3.0 MEX execution. The local build provides compatibility
 `matrix.h`/`mat.h` includes and defines `CV_REDUCE_SUM=cv::REDUCE_SUM`; see
 [the runtime report](../docs/RUNTIME_VALIDATION.md) for coverage and local scripts.
-This does not validate a MATLAB build or its ABI. LogHog still needs an API port:
-its `FilterEngine`/`createLinearFilter` calls are unavailable in that OpenCV version.
+This does not validate a MATLAB build or its ABI.
+
+LogHog now uses the public OpenCV 4 `filter2D` interface in place of
+`FilterEngine`/`createLinearFilter`. Build it with
+[`LogHog/build_loghog.m`](LogHog/build_loghog.m) into a separate directory.
+The rebuilt Octave module passed numerical regression and invalid-input checks;
+the same source also passed bounded native ASan/UBSan checks. See
+[the LogHog port report](../docs/LOGHOG_PORT.md) for commands, input requirements,
+coverage and the remaining MATLAB/legacy-binary limitations.
 
 Before using a rebuilt library, compare its values and gradients against the
 matching historical MATLAB objective on valid inputs. Do not use the

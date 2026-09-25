@@ -104,8 +104,11 @@ Apple Clang, C++17, ASan and UBSan; leak detection is disabled. OpenCV itself is
 a prebuilt library and is not sanitizer-instrumented. This does not prove that
 every native memory path or MATLAB ABI is safe.
 
-LogHog could not compile with OpenCV 4.13.0 because `FilterEngine` and
-`createLinearFilter` are unavailable. Its memory behavior remains unverified.
+At the time of this run, LogHog could not compile with OpenCV 4.13.0 because
+`FilterEngine` and `createLinearFilter` were unavailable. The subsequent
+[LogHog port](LOGHOG_PORT.md) resolves this blocker with `filter2D` and records
+separate numerical, native sanitizer and actual Octave MEX results. This
+report and its JSON retain the original run as a historical snapshot.
 Recovered DepthMapBinIO and archived `extra/` experiments are also outside the
 runtime coverage. No old binary was executed as a substitute for its source.
 
