@@ -92,3 +92,6 @@ __pycache__/
 /docs/delete_dead_code.txt
 /docs/move_manifest_*.txt
 /docs/residue_*.txt
+
+# Local agent instructions.
+/AGENTS.md
