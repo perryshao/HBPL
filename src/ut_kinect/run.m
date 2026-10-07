@@ -1,7 +1,7 @@
 % RUN Execute the UT-Kinect HBPL pipeline using prepared trajectory tables.
 %   Run hbplSetup('ut_kinect') first. The current folder must contain
 %   <jointId>.mat and <jointId>samples.mat with TRAJDB and TRAJSAMPLES.
-%   The historical squared objective is retained; see docs/POLISH_REVIEW.md.
+%   The historical squared objective is retained; see hbplCost numerical notes.
 
 clear;
 % delete traindata.mat;

@@ -80,3 +80,15 @@ pathdef.m
 __pycache__/
 *.pyc
 .venv/
+
+# Local AI review, validation and repository-cleanup records.
+# Keep these files on disk, outside version control.
+/docs/*REVIEW.md
+/docs/*VALIDATION*.md
+/docs/*VALIDATION*.json
+/docs/INVENTORY.md
+/docs/MEX_RECOVERY*
+/docs/LOGHOG_PORT.md
+/docs/delete_dead_code.txt
+/docs/move_manifest_*.txt
+/docs/residue_*.txt

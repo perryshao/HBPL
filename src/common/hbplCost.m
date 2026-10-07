@@ -58,7 +58,7 @@ function [f, df] = hbplCost(thetaVec, X, Y, lambda, C, numParts, partGroup, vari
 %   preserved exactly as originally run; changing either shifts results.
 %   The three '*_sq' variants also retain the historical gradient scaling:
 %   their hierarchical contribution omits the factor 2 from differentiating
-%   the squared objective. See docs/POLISH_REVIEW.md before changing it.
+%   the squared objective. Re-run the ablation before changing this scaling.
 %
 %   See also MINIMIZE, TRAINBINREGRESSION, PREDICTBINREGRESSION.
 

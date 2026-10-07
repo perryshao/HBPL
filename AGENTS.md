@@ -15,3 +15,14 @@ outputs. Keep raw datasets, papers, and historical research assets in their
 existing local locations unless the user explicitly requests moving them.
 Use the GitHub checkout for requested commits and pushes. Synchronization alone
 does not authorize automatically committing or pushing.
+
+## Local-only documentation
+
+Keep AI review, validation, recovery and cleanup records under `docs/` local;
+respect their `.gitignore` rules and do not force-add them. Removing these files
+from Git tracking must preserve both local copies. Keep user-facing usage and
+build instructions in the public README files and avoid links to local reports.
+
+The project `README.md` intentionally retains local Maintenance and Licence
+sections and report links that are absent from the GitHub README. Preserve this
+difference when synchronizing; do not copy either README wholesale over the other.

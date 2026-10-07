@@ -22,9 +22,8 @@ record.
 - dead code was not pruned and no function documentation was added
 - the raw datasets are not distributed here
 
-The three main pipelines under `src/` were reviewed and refactored; see
-[../docs/CODE_REVIEW.md](../docs/CODE_REVIEW.md). This folder was outside the
-scope of that review.
+The three main pipelines under `src/` were reviewed and refactored. This folder
+was outside the scope of that review.
 
 ## The `__remote.m` suffix
 
